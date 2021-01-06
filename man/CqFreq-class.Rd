@@ -11,7 +11,7 @@ S4 class that stores the estimation result of \code{\link{freqpcr}()}.
 \section{Slots}{
 
 \describe{
-\item{\code{report}}{A matrix of the simultaneous parameter estimation result. The rows represent the parameters \code{P}, \code{K}, \code{targetScale} (\eqn{\delta_{T}}), the Cq measurement error as \code{sdMeasure} (\eqn{\sigma_{c}}), and \code{EPCR} (\eqn{\eta}).}
+\item{\code{report}}{A matrix of the simultaneous parameter estimation result. The rows represent the parameters \code{P}, \code{K}, \code{targetScale} (\eqn{\delta_{T}}), \code{sdMeasure} (\eqn{\sigma_{c}}), and \code{EPCR} (\eqn{\eta}).}
 
 \item{\code{obj}}{Returned value of the optimizer function \code{\link{nlm}()} as a list.}
 

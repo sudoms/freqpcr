@@ -1,18 +1,19 @@
 # 04 simulation
 
-#' S4 class that stores the dummy Cq data for performance test.
+#' @title S4 class storing the dummy Cq data for performance test.
 #'
-#' A dummy Cq dataset suitable for the test of the package, typically the output of \code{\link{makeCqList}()}.
+#' @description A dummy Cq dataset suitable for the test of the package. It is obtained as the output of \code{\link{make_dummy}()}.
 #' @slot N Sample sizes as a numeric vector. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample.
-#' @slot m As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. It is the matrix with 3 rows and \code{ntrap} columns for diploidy, for which each column means the segregation ratio of the R (mutant) and S (wild type) individuals in each bulk sample. \code{m[1, i]} stores the number of R (or R homozygous) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample. As for haploidy, \code{m[2, i]} stands for the number of S individuals. \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the number of heterozygotes and S homozygotes, respectively.
-#' @slot xR,xS Numeric vector of the same length with N. \code{xR[i]} stores the amount of the template DNA for the R allele in the \emph{i}th bulk sample.
-#' @slot housek0,target0,housek1,target1 Numeric vectors of the same lengths with N. Store the Cq values.
-#' @slot DCW \eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW} is defined as (\code{target0-housek0}).
-#' @slot DCD \eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD} is defined as (\code{target1-housek1}).
+#' @slot m As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample.
+#' \cr As for haploidy, it is the matrix with 3 rows and \code{ntrap} columns, in which each column means the segregation ratio of the R and S individuals in each bulk sample. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the numbers of heterozygotes and SS homozygotes, respectively.
+#' @slot xR,xS Numeric vector of the same length with N. For instance, \code{xR[i]} stores the amount of the template DNA for the R allele in the \emph{i}th bulk sample (yield from \code{m[1, i]} individuals e.g. in haploidy).
+#' @slot housek0,target0,housek1,target1 Numeric vectors of the same lengths with N. Store the generated Cq values.
+#' @slot DCW \eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW} is defined as (\code{target0 - housek0}).
+#' @slot DCD \eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD} is defined as (\code{target1 - housek1}).
 #' @slot deldel \eqn{\Delta\Delta}Cq value, \code{deldel} is defined as (\code{DCD - DCW}).
-#' @slot RFreqMeasure A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}.
+#' @slot RFreqMeasure A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not included in the object to avoid leakage.
 #' @slot ObsP Defined as \code{min(RFreqMeasure, 1)} because \code{RFreqMeasure} can exceed 1 by definition.
-#' @slot rand.seed The seed of the random-number generator (RNG) fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data. It is usually specified by user.
+#' @slot rand.seed The seed of the random-number generator (RNG) which was fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data.
 #' @export
 CqList <- setClass("CqList",
     slots = c(
@@ -29,18 +30,16 @@ CqList <- setClass("CqList",
 )
 
 
-
-
-#' Generate dummy DNA dataset ready for allele-frequency estimation.
+#' @title Generate dummy DNA dataset ready for allele-frequency estimation.
 #'
-#' The function generates a dummy dataset of the Cq values. You can directly feed the output of this function to the first argument of \code{\link{simCqList}()}.
-#' @param rand.seed Seed for the R built-in random-number-generator used in the data generation.
+#' @description The function generates a dummy dataset of the Cq values. You can directly feed the output of this function to the first argument of \code{\link{sim_dummy}()}.
+#' @param rand.seed Seed for the R built-in random-number-generator.
 #' @param P Population allele frequency from which the test samples are generated. It is given as a numeric between 0 and 1.
 #' @param K The gamma shape parameter of the individual DNA yield, given as a positive numeric.
-#' @param ntrap,npertrap Scalar specifying the number of bulk samples (\code{ntrap}) or the numbers of individuals (both for haploidy and diploidy) contained in each bulk sample (\code{npertrap}). Currently limited to the case all bulk samples have the same sample size e.g. (4+4+4) when \code{ntrap = 3} and \code{npertrap = 4} hold.
-#' @param scaleDNA Small positive scalar that specifies the scale parameter of the gamma distribution appriximating the yield of DNA from (per-haploid) individual. The yield of \code{2*scaleDNA} is expected from a diploid. The quantity is determined as the relative amount (in linear scale) to the termination threshold of the realtime PCR cycle.
+#' @param ntrap,npertrap Scalar specifying the number of bulk samples (\code{ntrap}) and the numbers of individuals contained in each bulk sample (\code{npertrap}). Currently limited to the cases all bulk samples have the same sample size e.g. (4+4+4) when \code{ntrap = 3} and \code{npertrap = 4} hold.
+#' @param scaleDNA Small positive scalar that specifies the scale parameter of the gamma distribution appriximating the DNA yield from (per-haploid) individual. The yield of \code{2*scaleDNA} is expected from a diploid. The quantity is determined as the relative amount (in linear scale) to the termination threshold of the realtime PCR cycle.
 #' @param targetScale (\eqn{\delta_{T}}) The relative template DNA amount of the target locus to the houskeeping locus, given as a positive numeric.
-#' @param baseChange (\eqn{\delta_{B}}) The change rate in the template DNA quantities after the restriction enzyme digestion (in the RED-delta delta Cq method), given as a positive numeric. This parameter is not used in \code{\link{freqpcr}()}, but essential for \code{\link{knownqpcr}()} and \code{\link{makeCqList}()}.
+#' @param baseChange (\eqn{\delta_{B}}) The change rate in the template DNA quantities after the restriction enzyme digestion (in the RED-delta delta Cq method), given as a positive numeric. This parameter is not present in \code{\link{freqpcr}()}, but essential for \code{\link{knownqpcr}()} and \code{\link{make_dummy}()}.
 #' @param EPCR (\eqn{\eta}) Amplification efficiency per PCR cycle, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).
 #' @param sdMeasure (\eqn{\sigma_{c}}) The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}), given as a positive number.
 #' @inheritParams freqpcr
@@ -48,18 +47,16 @@ CqList <- setClass("CqList",
 #' @examples
 #' P <- 0.25
 #' # Calculate the segregation ratios for six bulk samples (1000 individuals for each).
-#' rbinom(n=6, size=1000, prob=P)
-#' rmultinom(n=6, size=1000, prob=c(P, 1-P))
-#' rmultinom(6, size=1000, prob=c(P^2, 2*P*(1-P), (1-P)^2))
+#' rmultinom(n=6, size=1000, prob=c(P, 1-P)) # haploidy
+#' rmultinom(6, size=1000, prob=c(P^2, 2*P*(1-P), (1-P)^2)) # diploidy
 #'
-#' # Make a dummy Cq dataset of six bulk DNA samples,
-#' # each of which comprises eight haploid individuals.
-#' dmy_cq <- makeCqList( rand.seed=1, P=0.75, K=2, ntrap=6, npertrap=8, scaleDNA=1e-07,
+#' # Dummy Cq dataset with six bulk samples, each of which comprises of eight haploids.
+#' dmy_cq <- make_dummy( rand.seed=1, P=0.75, K=2, ntrap=6, npertrap=8, scaleDNA=1e-07,
 #'                       targetScale=1.5, baseChange=0.3, EPCR=0.95, zeroAmount=1e-3,
 #'                       sdMeasure=0.3, diploid=FALSE )
 #' print(dmy_cq)
 #' @export
-makeCqList <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
+make_dummy <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
                         targetScale, baseChange, EPCR, zeroAmount, sdMeasure, diploid=FALSE ) {
     set.seed(rand.seed)
     N <- rep(npertrap, ntrap)
@@ -101,40 +98,42 @@ makeCqList <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
 
 
 
-#' Simulate parameter estimation based on user-generated dummy data.
+#' @title Simulate parameter estimation based on user-generated dummy data.
 #'
-#' Wrapper of \code{\link{freqpcr}()} function suitable for the test of the function using randomly generated datasets i.e., the output of \code{\link{makeCqList}()}.
-#' @param CqList Object belonging to the \linkS4class{CqList} class, typically the output from \code{\link{makeCqList}()}. Having the slots \code{N}, \code{target0}, \code{target1}, \code{housek0}, and \code{housek1}, all of which are numeric vectors of the same length.
-#' @param P,K,targetScale,sdMeasure If NULL, the parameter is considered unknown and estimated internally via \code{\link{freqpcr}()}. If the value is specified, it is passed to \code{\link{freqpcr}()} as a fixed parameter. \code{EPCR} and \code{zeroAmount} are always treated as fixed parameters, for which values must be supplied.
-#' @param beta,diploid,maxtime,print.level Parameters which are passed directly to \code{\link{freqpcr}()}.
-#' @param aux Additional information to be displayed. The default is \code{NULL}. If user input some values, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.
+#' @description Wrapper of \code{\link{freqpcr}()} suitable for the performance test the using randomly-generated data object.
+#' @param CqList Object belonging to the \linkS4class{CqList} class, typically the output from \code{\link{make_dummy}()}. Having the slots \code{N}, \code{target0}, \code{target1}, \code{housek0}, and \code{housek1}, all of which are numeric vectors of the same length.
+#' @param P,K,targetScale,sdMeasure If NULL (default), the parameter is considered unknown and estimated internally via \code{\link{freqpcr}()}. If the value is specified, it is passed to \code{\link{freqpcr}()} as a fixed parameter. \code{EPCR} and \code{zeroAmount} are always treated as fixed parameters, for which values must be supplied.
+#' @param beta,diploid,maxtime,print.level Configuration parameters which are passed directly to \code{\link{freqpcr}()}.
+#' @param aux Additional information to be displayed. The default is \code{NULL}. If some value is imput by the user, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.
+#' @param ... Additional arguments passed to \code{\link{freqpcr}()}.
 #' @inheritParams freqpcr
-#' @return Object of the S4 class \linkS4class{CqFreq}.
+#' @return Object of the S4 class \linkS4class{CqFreq}, which is same as \code{\link{freqpcr}()}.
 #' @examples
+#' # Prepare the parameter values.
 #' K <- 2 # You already know the size of K in this case.
 #' EPCR <- 0.97 # The sizes of EPCR and zeroAmount must always be supplied.
 #' zeroAmount <- 1.6e-03
 #' is.diploid <- FALSE
 #'
-#' # First, make a dummy Cq dataset of six bulk DNA samples,
-#' # each of which comprises eight haploid individuals.
-#' dmy_cq <- makeCqList( rand.seed=1, P=0.75, K=K, ntrap=6, npertrap=8, scaleDNA=1e-07,
+#' # First, make a dummy Cq dataset with six bulk DNA samples,
+#' # each of which comprises of eight haploid individuals.
+#' dmy_cq <- make_dummy( rand.seed=1, P=0.75, K=K, ntrap=6, npertrap=8, scaleDNA=1e-07,
 #'                       targetScale=1.5, baseChange=0.3, EPCR=EPCR,
 #'                       zeroAmount=zeroAmount, sdMeasure=0.3, diploid=is.diploid )
 #'
 #' # Then, estimate the population allele frequency from the dummy Cq dataset.
-#' simCqList( CqList=dmy_cq, EPCR=EPCR, zeroAmount=zeroAmount, K=K,
+#' sim_dummy(  CqList=dmy_cq, EPCR=EPCR, zeroAmount=zeroAmount, K=K,
 #'             beta=TRUE, diploid=is.diploid, maxtime=60, print.level=2, aux="test" )
 #'
 #' # If the maximum calculation time was too short to converge, nlm() returns error.
-#' # simCqList() avoids error and returns a matrix filled with zeros.
-#' simCqList( CqList=dmy_cq, EPCR=EPCR, zeroAmount=zeroAmount, K=K,
+#' # sim_dummy() then returns a matrix filled with zeros.
+#' sim_dummy(  CqList=dmy_cq, EPCR=EPCR, zeroAmount=zeroAmount, K=K,
 #'             beta=FALSE, diploid=is.diploid, maxtime=0.01, print.level=2 )
 #' @export
 #' @family estimation procedures
-simCqList <- function( CqList, EPCR, zeroAmount,
+sim_dummy <- function(  CqList, EPCR, zeroAmount,
                         P=NULL, K=NULL, targetScale=NULL, sdMeasure=NULL,
-                        beta, diploid, maxtime, print.level, aux=NULL, ... ) {
+                        beta, diploid, maxtime, print.level, aux=NULL, ...  ) {
     if (!is.null(aux)) {
         cat("\n\n")
         cat("--------------------------------------------------------------------------------")
@@ -148,8 +147,8 @@ simCqList <- function( CqList, EPCR, zeroAmount,
     }
     e1 <- try( {
         result.list <- freqpcr( N=CqList@N, # number of individuals (not chromosome sets)
-                                target0=CqList@target0, target1=CqList@target1,
-                                housek0=CqList@housek0, housek1=CqList@housek1,
+                                housek0=CqList@housek0, target0=CqList@target0,
+                                housek1=CqList@housek1, target1=CqList@target1,
                                 P=P, K=K, targetScale=targetScale, sdMeasure=sdMeasure, EPCR=EPCR,
                                 zeroAmount=zeroAmount, beta=beta, diploid=diploid,
                                 # pvalue=0.05, gradtol=1e-4, steptol=1e-7, iterlim=100,

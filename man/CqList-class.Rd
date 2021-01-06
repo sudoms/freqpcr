@@ -4,31 +4,32 @@
 \name{CqList-class}
 \alias{CqList-class}
 \alias{CqList}
-\title{S4 class that stores the dummy Cq data for performance test.}
+\title{S4 class storing the dummy Cq data for performance test.}
 \description{
-A dummy Cq dataset suitable for the test of the package, typically the output of \code{\link{makeCqList}()}.
+A dummy Cq dataset suitable for the test of the package. It is obtained as the output of \code{\link{make_dummy}()}.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{N}}{Sample sizes as a numeric vector. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample.}
 
-\item{\code{m}}{As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. It is the matrix with 3 rows and \code{ntrap} columns for diploidy, for which each column means the segregation ratio of the R (mutant) and S (wild type) individuals in each bulk sample. \code{m[1, i]} stores the number of R (or R homozygous) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample. As for haploidy, \code{m[2, i]} stands for the number of S individuals. \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the number of heterozygotes and S homozygotes, respectively.}
+\item{\code{m}}{As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample.
+\cr As for haploidy, it is the matrix with 3 rows and \code{ntrap} columns, in which each column means the segregation ratio of the R and S individuals in each bulk sample. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the numbers of heterozygotes and SS homozygotes, respectively.}
 
-\item{\code{xR,xS}}{Numeric vector of the same length with N. \code{xR[i]} stores the amount of the template DNA for the R allele in the \emph{i}th bulk sample.}
+\item{\code{xR,xS}}{Numeric vector of the same length with N. For instance, \code{xR[i]} stores the amount of the template DNA for the R allele in the \emph{i}th bulk sample (yield from \code{m[1, i]} individuals e.g. in haploidy).}
 
-\item{\code{housek0,target0,housek1,target1}}{Numeric vectors of the same lengths with N. Store the Cq values.}
+\item{\code{housek0,target0,housek1,target1}}{Numeric vectors of the same lengths with N. Store the generated Cq values.}
 
-\item{\code{DCW}}{\eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW} is defined as (\code{target0-housek0}).}
+\item{\code{DCW}}{\eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW} is defined as (\code{target0 - housek0}).}
 
-\item{\code{DCD}}{\eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD} is defined as (\code{target1-housek1}).}
+\item{\code{DCD}}{\eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD} is defined as (\code{target1 - housek1}).}
 
 \item{\code{deldel}}{\eqn{\Delta\Delta}Cq value, \code{deldel} is defined as (\code{DCD - DCW}).}
 
-\item{\code{RFreqMeasure}}{A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}.}
+\item{\code{RFreqMeasure}}{A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not included in the object to avoid leakage.}
 
 \item{\code{ObsP}}{Defined as \code{min(RFreqMeasure, 1)} because \code{RFreqMeasure} can exceed 1 by definition.}
 
-\item{\code{rand.seed}}{The seed of the random-number generator (RNG) fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data. It is usually specified by user.}
+\item{\code{rand.seed}}{The seed of the random-number generator (RNG) which was fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data.}
 }}
 

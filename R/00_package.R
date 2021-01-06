@@ -20,11 +20,16 @@
 ## You should have received a copy of the GNU General Public License along with this program.
 ## If not, see <http://www.gnu.org/licenses/>.
 
-
+#' The freqpcr package
+#'
+#' Maximum likelihood estimation of allele frequency from quantitive PCR based on the double-delta Cq method.
+#'
+#' @docType package
 #' @importFrom methods new
 #' @importFrom cubature cubintegrate
 #' @importFrom stats dbeta dbinom dgamma dmultinom dnorm nlm optim plogis qlogis qnorm rbinom rgamma rmultinom rnorm
 #' @importFrom utils flush.console
 #' @keywords internal
 #' @encoding UTF-8
+#' @aliases freqpcr-package
 "_PACKAGE"

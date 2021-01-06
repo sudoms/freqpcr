@@ -1,0 +1,16 @@
+citHeader("To cite freqpcr in publications use:")
+
+citEntry(entry="Article",
+    title = "freqpcr: interval estimation of population allele frequency based on \u0394\u0394Cq measures of quantitative PCR over bulk samples.",
+    author = personList(
+        as.person("Masaaki Sudo"),
+        as.person("Masahiro Osakabe")),
+    journal = "BioRxiv",
+    year = "2021",
+    volume = "xx",
+    pages = "xxxx--xxxx",
+    textVersion =
+        paste(  "Masaaki Sudo, Masahiro Osakabe (2021).",
+                "freqpcr: interval estimation of population allele frequency based on \u0394\u0394Cq measures of quantitative PCR over bulk samples.",
+                "BioRxiv, xx."  )
+)

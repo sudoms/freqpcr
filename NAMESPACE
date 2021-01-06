@@ -2,8 +2,9 @@
 
 export(freqpcr)
 export(knownqpcr)
-export(makeCqList)
-export(simCqList)
+export(knownqpcr_unpaired)
+export(make_dummy)
+export(sim_dummy)
 exportClasses(CqFreq)
 exportClasses(CqList)
 importFrom(cubature,cubintegrate)

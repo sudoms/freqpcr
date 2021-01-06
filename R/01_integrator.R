@@ -2,7 +2,7 @@
 
 #' @title Integration of likelihood function based on the beta assumption.
 
-#' @description Internal function to integrate the likelihood getting the \eqn{\Delta}Cq value (the argument \code{del}) over the entire range of the allele ratio (0 to 1). Vectorized for multiple bulk samples. Having the same arguments with integrate_gamma.
+#' @description Internal function to integrate the likelihood getting the \eqn{\Delta}Cq value (the argument \code{del}) over the entire range of the allele ratio (0 to 1). Vectorized for multiple bulk samples. Having the same arguments with .integrate_gamma.
 #' @param del Numeric vector of the observed \eqn{\Delta}Cq values.
 #' @param SHR The gamma shape parameters for the mutant (R) portion of the bulk samples. Should be the same length as del. Each element of SHR is defined as K*(the assumed number of R allele in the bulk sample).
 #' @param SHS The gamma shape parameters for the wild (S) portion of the bulk samples. Should be the same length as del. Each element of SHS is defined as K*(the assumed number of S allele in the bulk sample).
@@ -24,7 +24,7 @@
 #' \cr
 #' \code{suave} and \code{vegas} are Monte Carlo integration and slow. They are certainly accurate even at \code{reltol = 1}, but interior to \code{cuhre} with same \code{reltol}.
 #' @keywords internal
-integrate_beta <- function (   del, SHR, SHS, zeroAmount, targetScale, sdMeasure, xsm=2, EPCR,
+.integrate_beta <- function (   del, SHR, SHS, zeroAmount, targetScale, sdMeasure, xsm=2, EPCR,
                                 cubmethod="hcubature", relTol=1e-1, absTol=1e-8, maxEval=10^6) {
     fa <- function(x, SHR, SHS, del, zeroAmount, targetScale, sdMeasure, xsm, EPCR) {
         dbeta(x, shape1=SHR, shape2=SHS) *
@@ -40,12 +40,12 @@ integrate_beta <- function (   del, SHR, SHS, zeroAmount, targetScale, sdMeasure
 
 #' @title Double integration of likelihood over the two DNA quantities obeying the gamma distributions.
 
-#' @description Internal function to integrate the likelihood getting \eqn{\Delta}Cq value (the argument \code{del}) over the entire range of the DNA quantities of the two alleles, 0 <= x_S < Inf and 0 <= x_R < Inf. Vectorized for multiple bulk samples. It shares the arguments with integrate_beta.
-#' @inheritParams integrate_beta
+#' @description Internal function to integrate the likelihood getting \eqn{\Delta}Cq value (the argument \code{del}) over the entire range of the DNA quantities of the two alleles, 0 <= x_S < Inf and 0 <= x_R < Inf. Vectorized for multiple bulk samples. It shares the arguments with .integrate_beta.
+#' @inheritParams .integrate_beta
 #' @return A numeric vector of marginal likelihoods having the same length as \code{del}.
 #' @family integrators
 #' @keywords internal
-integrate_gamma <- function (   del, SHR, SHS, zeroAmount, targetScale, sdMeasure, xsm=2, EPCR,
+.integrate_gamma <- function (  del, SHR, SHS, zeroAmount, targetScale, sdMeasure, xsm=2, EPCR,
                                 cubmethod="hcubature", relTol=1e-1, absTol=1e-8, maxEval=10^6) {
     # double integration of R and S DNA quantities  (x_R, x_S) over {0 to Inf, 0 to Inf}
     # transformed in a polar coordinates system (r, theta) over {0 to 1, 0 to pi/2}

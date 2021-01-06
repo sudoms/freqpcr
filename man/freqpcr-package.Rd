@@ -3,16 +3,16 @@
 \docType{package}
 \encoding{UTF-8}
 \name{freqpcr-package}
-\alias{freqpcr}
 \alias{freqpcr-package}
-\title{freqpcr: Maximum likelihood estimation of population allele frequency from quantitive PCR based on the double-Delta Cq method}
+\alias{_PACKAGE}
+\title{The freqpcr package}
 \description{
-Interval estimation of the population allele frequency from qPCR analysis based on the restriction enzyme digestion (RED)-DeltaDeltaCq method (Osakabe et al. 2017) as well as general DeltaDeltaCq analysis. Compatible with the Cq measurement on DNA extract from multiple individuals at once, so called "group-testing" because the model assumes the quantity of DNA extracted from an individual organism to follow a gamma distribution, thereby the point estimate is robust to the uncertainty of DNA yield.
+Maximum likelihood estimation of allele frequency from quantitive PCR based on the double-delta Cq method.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/sudoms}
+  \item \url{https://github.com/sudoms/freqpcr}
 }
 
 }
