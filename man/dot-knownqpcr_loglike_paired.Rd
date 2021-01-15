@@ -2,7 +2,7 @@
 % Please edit documentation in R/03_known_ratio.R
 \name{.knownqpcr_loglike_paired}
 \alias{.knownqpcr_loglike_paired}
-\title{Log-likelihood of getting Cq values when exact allele content is known.}
+\title{Log-likelihood of obtaining Cq values when exact allele content is known.}
 \usage{
 .knownqpcr_loglike_paired(X, A, trueY, housek0, target0, housek1, target1)
 }
@@ -19,6 +19,6 @@
 A scalar of the log likelihood.
 }
 \description{
-Internal function to calculate the log-likelihood getting the sets of four Cq measurements under true allele frequency for each bulk sample is known. As the largest difference from \code{\link{.freqpcr_loglike}()}, this function does not take account for the uncertainty in individual DNA yield.
+The internal function to calculate the log-likelihood by obtaining the sets of four Cq measurements under true allele frequency for each bulk sample is known. As the largest difference from \code{\link{.freqpcr_loglike}()}, this function does not take account for the uncertainty of the individual DNA yield.
 }
 \keyword{internal}

@@ -78,9 +78,9 @@ Object of the S4 class \linkS4class{CqFreq}. The slot \code{report} is a matrix 
 }
 }
 \description{
-The function estimates the population allele frequency using the dataset of Cq values measured over \code{length(N)} bulk samples, each of which has the sample size of \code{N[i]} as the number of individuals included. \code{N[i]} can be 1, meaning every individual is analyzed separately. For the \emph{i}th (bulk) sample, the four Cq values have been measured as \code{target0[i]}, \code{target1[i]}, \code{housek0[i]}, and \code{housek1[i]}, respectively.
+The function estimates the population allele frequency using the dataset of Cq values measured over \code{length(N)} bulk samples, each of which has a sample size of \code{N[i]} as the number of individuals included. \code{N[i]} can be 1, meaning that every individual is analyzed separately. For the \emph{i}th (bulk) sample, the four Cq values were measured as \code{target0[i]}, \code{target1[i]}, \code{housek0[i]}, and \code{housek1[i]}, respectively.
 \cr
-The function can estimate up to five parameters simultaneously when the Cq measures are available for more than two bulk samples: \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}, though the last one is not reliable in many cases and users are encouraged to know the size for \code{EPCR} beforehand by using \code{\link{knownqpcr}()} or \code{\link{knownqpcr_unpaired}()}. By default, parameters other than \code{EPCR} are estimated.
+The function can estimate up to five parameters simultaneously when the Cq measures are available for more than two bulk samples: \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}, although \code{EPCR} is not reliable in many cases and users are encouraged to know the size of \code{EPCR} beforehand by using \code{\link{knownqpcr}()} or \code{\link{knownqpcr_unpaired}()}. By default, parameters other than the \code{EPCR} were estimated.
 }
 \section{Choise of the parameters to be estimated}{
 

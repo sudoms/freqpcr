@@ -7,7 +7,7 @@
 \alias{_PACKAGE}
 \title{The freqpcr package}
 \description{
-Maximum likelihood estimation of allele frequency from quantitive PCR based on the double-delta Cq method.
+Maximum Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples.
 }
 \seealso{
 Useful links:

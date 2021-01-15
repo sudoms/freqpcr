@@ -50,7 +50,7 @@ A table containing the estimated values for the following parameters:
 }
 }
 \description{
-Function to estimate the auxiliary experimental parameters using DNA solutions, where the dataset contains the samples with multiple allele mixing ratios (the argument \code{trueY}) and the exact mixing ratio are known for each sample. This function is used when all the replicates comprise of the observations on the \eqn{2\times2} combinations of the qPCR conditions: (target- versus housekeeping-gene) and (undigested or digested with endonuclease). If the combination is not complete, use another function \code{\link{knownqpcr_unpaired}()}, where you can deal with the situation e.g., only a part of the undigested samples was quantified.
+The function to estimate the auxiliary experimental parameters using DNA solutions, where the dataset contains samples with multiple allele mixing ratios (the argument \code{trueY}) and the exact mixing ratio are known for each sample. This function is used when all replicates comprise the observations on the \eqn{2\times2} combinations of the qPCR conditions: (target-gene versus housekeeping-gene) and (undigested or digested with endonuclease). If the combination is not complete, use another function, \code{\link{knownqpcr_unpaired}()}, where you can deal with the situation, for example, only a part of the undigested sample was quantified.
 }
 \examples{
 # A dummy Cq dataset: four mixing ratios (0.1, 0.25, 0.5, 1) with four replicates.

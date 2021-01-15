@@ -2,7 +2,7 @@
 % Please edit documentation in R/02_freqpcr.R
 \name{.freqpcr_loglike}
 \alias{.freqpcr_loglike}
-\title{Log-likelihood of getting Cq values under given parameter set.}
+\title{Log-likelihood of obtaining Cq values under given parameter set.}
 \usage{
 .freqpcr_loglike(
   X,
@@ -34,5 +34,5 @@
 A scalar of the log likelihood.
 }
 \description{
-Internal function called from the optimizer (\code{\link[stats]{nlm}()}) running in \code{\link{freqpcr}()}. It defines the log-likelihood getting the two \eqn{\Delta}Cq values (differences in the four Cq measurements) provided the allele mixing ratio for each bulk sample is given together with other parameters. The function is vectorized over multiple (bulk) samples.
+The internal function is called from the optimizer (\code{\link[stats]{nlm}()}) running in \code{\link{freqpcr}()}. It defines the log-likelihood by obtaining the two \eqn{\Delta}Cq values (differences in the four Cq measurements) provided that the allele mixing ratio for each bulk sample is given together with other parameters. This function was vectorized over multiple (bulk) samples.
 }

@@ -46,7 +46,7 @@ knownqpcr_unpaired(
 A table containing the estimated parameter values, which is same as \code{\link{knownqpcr}()}.
 }
 \description{
-A variant of \code{\link{knownqpcr}()} to estimate the auxiliary parameters when the exact mixing ratios are known for each the sample, but the qPCR analyses are conducted for only a part of the sample sets. To deal with the cases that the combination of the four Cq measurements is incomplete (thus the data lengths of \code{housek0}, \code{target0}, \code{housek1}, and \code{target1} are different), the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Gene} and \code{Digest}).
+A variant of \code{\link{knownqpcr}()} is used to estimate the auxiliary parameters when the exact mixing ratios are known for each sample. However, qPCR analyses are only conducted for part of the sample sets. To deal with cases where the combination of the four Cq measurements are incomplete (thus the data lengths of \code{housek0}, \code{target0}, \code{housek1}, and \code{target1} are different), the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Gene} and \code{Digest}).
 }
 \examples{
 # A dummy Cq dataset: four mixing ratios (0.1, 0.25, 0.5, 1) with four replicates.

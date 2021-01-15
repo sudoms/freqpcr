@@ -1,7 +1,7 @@
 ################################################################################################################################
 
 # Name: freqpcr
-# Short description: Maximum likelihood estimation of allele frequency from quantitive PCR based on the double-delta Cq method
+# Short description: Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples
 # Author: Masaaki Sudo (NARO, JAPAN)
 # Maintainer: Masaaki Sudo
 ## https://sudori.info/english.html
@@ -22,7 +22,7 @@
 
 #' The freqpcr package
 #'
-#' Maximum likelihood estimation of allele frequency from quantitive PCR based on the double-delta Cq method.
+#' Maximum Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples.
 #'
 #' @docType package
 #' @importFrom methods new

@@ -3,7 +3,7 @@
 
 #' @title Estimate auxiliary parameters using the bulk samples with known allele ratios.
 #'
-#' @description Function to estimate the auxiliary experimental parameters using DNA solutions, where the dataset contains the samples with multiple allele mixing ratios (the argument \code{trueY}) and the exact mixing ratio are known for each sample. This function is used when all the replicates comprise of the observations on the \eqn{2\times2} combinations of the qPCR conditions: (target- versus housekeeping-gene) and (undigested or digested with endonuclease). If the combination is not complete, use another function \code{\link{knownqpcr_unpaired}()}, where you can deal with the situation e.g., only a part of the undigested samples was quantified.
+#' @description The function to estimate the auxiliary experimental parameters using DNA solutions, where the dataset contains samples with multiple allele mixing ratios (the argument \code{trueY}) and the exact mixing ratio are known for each sample. This function is used when all replicates comprise the observations on the \eqn{2\times2} combinations of the qPCR conditions: (target-gene versus housekeeping-gene) and (undigested or digested with endonuclease). If the combination is not complete, use another function, \code{\link{knownqpcr_unpaired}()}, where you can deal with the situation, for example, only a part of the undigested sample was quantified.
 #' @param A Sample sizes as a numeric vector. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Considering the case you have arranged the artificial sample solution with arbitrary DNA concentration, it is convenient to determine \code{A} to ensure that the equivalent amount of DNA extracted from an individual is approximately 1. As the concentration in total is also adjusted with the parameter \code{targetScale} (see Value section), this variable should be used exclusively to reflect the differences in relative concentration between samples.
 #' @param trueY A numeric vector of the same length as \code{A}. \code{trueY[i]} signifies the true frequency of the mutant allele in the \emph{i}th bulk sample. The values must be between 0 and 1.
 #' @param housek0,target0,housek1,target1 Measured Cq values. Numeric vectors having the same length as \code{A} and \code{trueY}. Any of the values should not be duplicated (if so, use \code{\link{knownqpcr_unpaired}()} instead).
@@ -70,9 +70,9 @@ knownqpcr <- function(  A, trueY, housek0, target0, housek1, target1,
 }
 
 
-#' @title Log-likelihood of getting Cq values when exact allele content is known.
+#' @title Log-likelihood of obtaining Cq values when exact allele content is known.
 #'
-#' @description Internal function to calculate the log-likelihood getting the sets of four Cq measurements under true allele frequency for each bulk sample is known. As the largest difference from \code{\link{.freqpcr_loglike}()}, this function does not take account for the uncertainty in individual DNA yield.
+#' @description The internal function to calculate the log-likelihood by obtaining the sets of four Cq measurements under true allele frequency for each bulk sample is known. As the largest difference from \code{\link{.freqpcr_loglike}()}, this function does not take account for the uncertainty of the individual DNA yield.
 #' @param X A numeric vector that stores the current parameter sizes of \code{meanDNA}, \code{targetScale}, \code{baseChange}, \code{sdMeasure}, \code{zeroAmount}, and \code{EPCR} in log scale.
 #' @param target0,target1,housek0,housek1 Measured Cq values. Numeric vectors having the same length as \code{A} and \code{trueY}.
 #' @inheritParams knownqpcr
@@ -107,7 +107,7 @@ knownqpcr <- function(  A, trueY, housek0, target0, housek1, target1,
 
 #' @title Estimate auxiliary parameters when the sample pairs are incomplete.
 #'
-#' @description A variant of \code{\link{knownqpcr}()} to estimate the auxiliary parameters when the exact mixing ratios are known for each the sample, but the qPCR analyses are conducted for only a part of the sample sets. To deal with the cases that the combination of the four Cq measurements is incomplete (thus the data lengths of \code{housek0}, \code{target0}, \code{housek1}, and \code{target1} are different), the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Gene} and \code{Digest}).
+#' @description A variant of \code{\link{knownqpcr}()} is used to estimate the auxiliary parameters when the exact mixing ratios are known for each sample. However, qPCR analyses are only conducted for part of the sample sets. To deal with cases where the combination of the four Cq measurements are incomplete (thus the data lengths of \code{housek0}, \code{target0}, \code{housek1}, and \code{target1} are different), the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Gene} and \code{Digest}).
 #' @param A Sample sizes as a numeric vector.
 #' @param Gene Numeric vector that specify the gene is housekeeping (= 0) or target (= 1), having the same length as \code{A} and \code{trueY}.
 #' @param Digest Numeric vector having the same length as \code{A} and \code{trueY}. It specify the gene is intact (= 0) or digested with endonuclease (= 1) in the RED-\eqn{\Delta\Delta}Cq method. In general \eqn{\Delta\Delta}Cq analyses, the argument means all the alleles on the target locs will be amplified (= 0) (it has ) or only the R portion will be amplified (using an R-specific primer set).
