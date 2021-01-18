@@ -47,7 +47,7 @@ zeroAmount:
 * (in general DeltaDelta Cq analyses) small portion of the off-target allele amplified in the PCR process.
 * It needs to be always specified by the user as a number between 0 and 1, usually near 0.
 
-## Make a dummy Cq dataset with six bulk samples, each of which comprises of eight haploid individuals
+## Make a dummy Cq dataset with six bulk samples, each of which comprises eight haploid individuals
 ```
 dmy_cq <- make_dummy(   rand.seed=1, P=P, K=K, ntrap=6, npertrap=8,
                         scaleDNA=1e-07, targetScale=1.5, baseChange=0.3,
