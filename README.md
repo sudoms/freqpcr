@@ -17,6 +17,22 @@ Therefore, the point estimate is robust regarding the uncertainty of the DNA yie
 ```
 library(remotes)
 install_github("sudoms/freqpcr")
+
+library(freqpcr)
+packageVersion("freqpcr")
+```
+If there are errors (converted from warning), it might be the case the dependent package 'cubature' has been built on a newer version of R (https://github.com/r-lib/remotes/issues/403).
+```
+** byte-compile and prepare package for lazy loading
+Error: (converted from warning) package 'cubature' was built under R version 3.6.3
+```
+Then, set the following environment variable: R_REMOTES_NO_ERRORS_FROM_WARNINGS="true" and run install_github() again.
+```
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+install_github("sudoms/freqpcr")
+
+library(freqpcr)
+packageVersion("freqpcr")
 ```
 
 # Usage
@@ -27,14 +43,14 @@ library(freqpcr)
 ## First, define the parameters
 ```
 # The population allele frequency to be estimated
-P <- 0.75
+P <- 0.15
 # The gamma shape parameter of the individual DNA yield (to be estimated)
-K <- 2
+K <- 4
 # The measurement error (SD) on each Cq (Ct) value following Normal(0, SD).
-sdMeasure <- 0.3
+sdMeasure <- 0.2
 
 # These auxiliary parameters must be known
-EPCR <- 0.95
+EPCR <- 0.97
 zeroAmount <- 0.0016
 ```
 
@@ -49,11 +65,59 @@ zeroAmount:
 
 ## Make a dummy Cq dataset with six bulk samples, each of which comprises eight haploid individuals
 ```
-dmy_cq <- make_dummy(   rand.seed=1, P=P, K=K, ntrap=6, npertrap=8,
-                        scaleDNA=1e-07, targetScale=1.5, baseChange=0.3,
+dmy_cq <- make_dummy(   rand.seed=71, P=P, K=K, ntrap=4, npertrap=8,
+                        scaleDNA=1e-06, targetScale=1.2, baseChange=0.2,
                         EPCR=EPCR, zeroAmount=zeroAmount,
                         sdMeasure=sdMeasure, diploid=FALSE  )
 print(dmy_cq)
+```
+
+```
+> print(dmy_cq)
+An object of class "CqList"
+Slot "N":
+[1] 8 8 8 8
+
+Slot "m":
+     [,1] [,2] [,3] [,4]
+[1,]    1    1    1    0
+[2,]    7    7    7    8
+
+Slot "xR":
+[1] 6.654827e-07 1.540772e-06 7.998461e-07 0.000000e+00
+
+Slot "xS":
+[1] 5.541084e-06 7.909241e-06 8.052976e-06 1.004673e-05
+
+Slot "housek0":
+[1] 17.57120 16.90864 17.14117 16.88547
+
+Slot "target0":
+[1] 17.65665 16.84725 16.58306 16.90106
+
+Slot "housek1":
+[1] 19.90382 19.08542 19.59406 19.42896
+
+Slot "target1":
+[1] 23.13257 21.59854 22.97203 28.34278
+
+Slot "DCW":
+[1]  0.08544953 -0.06139074 -0.55811003  0.01559466
+
+Slot "DCD":
+[1] 3.228745 2.513126 3.377968 8.913814
+
+Slot "deldel":
+[1] 3.143296 2.574517 3.936078 8.898219
+
+Slot "RFreqMeasure":
+[1] 0.11868765 0.17453873 0.06933585 0.00239759
+
+Slot "ObsP":
+[1] 0.11868765 0.17453873 0.06933585 0.00239759
+
+Slot "rand.seed":
+[1] 71
 ```
 ## Estimation with freqpcr
 * When P, K, targetScale, and baseChange are marked unknown.
