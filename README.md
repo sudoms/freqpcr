@@ -63,7 +63,8 @@ zeroAmount:
 * (in general DeltaDelta Cq analyses) small portion of the off-target allele amplified in the PCR process.
 * It needs to be always specified by the user as a number between 0 and 1, usually near 0.
 
-## Make a dummy Cq dataset with six bulk samples, each of which comprises eight haploid individuals
+## Make a dummy Cq dataset
+With four bulk samples, each of which comprises eight haploid individuals
 ```
 dmy_cq <- make_dummy(   rand.seed=71, P=P, K=K, ntrap=4, npertrap=8,
                         scaleDNA=1e-06, targetScale=1.2, baseChange=0.2,
@@ -126,6 +127,46 @@ result <- freqpcr(  dmy_cq@N,
                     dmy_cq@housek0, dmy_cq@target0, dmy_cq@housek1, dmy_cq@target1,
                     EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=2  )
 print(result)
+```
+
+```
+> print(result)
+An object of class "CqFreq"
+Slot "report":
+                                                 Estimate Fixed  (scaled) (scaled.SE)       2.5%       97.5%
+P (R-allele frequency)                         0.09773189     0 -2.222684  0.60914920 0.03178086   0.2633220
+K (gamma shape parameter)                     20.92728472     0  3.041054  1.83522514 0.57354357 763.5884568
+targetScale (relative amount of target locus)  1.11922896     0  0.112640  0.08911953 0.93985370   1.3328388
+Cq measurement error (SD)                      0.20973065     0 -1.561931  0.32845069 0.11017528   0.3992451
+EPCR (Duplication efficiency of PCR)           0.97000000     1        NA          NA         NA          NA
+
+Slot "obj":
+$minimum
+[1] 6.094915
+
+$estimate
+[1] -2.222684  3.041054  0.112640 -1.561931
+
+$gradient
+[1] -3.401052e-05 -8.275831e-05 -5.170264e-05  8.878366e-05
+
+$hessian
+            [,1]        [,2]       [,3]       [,4]
+[1,]  2.71023746  0.05094368   1.168535 -0.1766755
+[2,]  0.05094368  0.37630056   2.045198 -0.6539723
+[3,]  1.16853487  2.04519835 147.389557  6.4578192
+[4,] -0.17667547 -0.65397225   6.457819 11.1504638
+
+$code
+[1] 1
+
+$iterations
+[1] 12
+
+
+Slot "cal.time":
+   user  system elapsed 
+   0.70    0.14    0.85 
 ```
 * When you have knowledge on the size of baseChange (= set as a fixed parameter).
 ```
