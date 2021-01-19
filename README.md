@@ -72,7 +72,7 @@ result <- freqpcr(  dmy_cq@N,
 ```
 
 # Note
-* Download PDF help of the latest release https://github.com//sudoms/freqpcr/releases/latest
+* Download PDF help of the latest release https://github.com/sudoms/freqpcr/releases/latest
 * Preprint is soon available from bioRxiv
 * Simulation dataset: https://figshare.com/account/home#/collections/5258027
 
