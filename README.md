@@ -42,17 +42,22 @@ library(freqpcr)
 
 ## First, define the parameters
 ```
-# The population allele frequency to be estimated
 P <- 0.15
-# The gamma shape parameter of the individual DNA yield (to be estimated)
 K <- 4
-# The measurement error (SD) on each Cq (Ct) value following Normal(0, SD).
 sdMeasure <- 0.2
 
 # These auxiliary parameters must be known
 EPCR <- 0.97
 zeroAmount <- 0.0016
 ```
+P:
+* The population allele frequency to be estimated
+
+K:
+* The gamma shape parameter of the individual DNA yield
+
+sdMeasure:
+* The measurement error on each Cq (Ct) value, following Normal(0, sdMeasure)
 
 EPCR: 
 * Amplification efficiency per PCR cycle, given as a positive numeric.
@@ -123,8 +128,8 @@ Slot "rand.seed":
 ## Estimation with freqpcr
 * When P, K, targetScale, and baseChange are marked unknown.
 ```
-result <- freqpcr(  dmy_cq@N,
-                    dmy_cq@housek0, dmy_cq@target0, dmy_cq@housek1, dmy_cq@target1,
+result <- freqpcr(  N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0, 
+                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
                     EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=2  )
 print(result)
 ```
@@ -168,11 +173,11 @@ Slot "cal.time":
    user  system elapsed 
    0.70    0.14    0.85 
 ```
-* When you have knowledge on the size of baseChange (= set as a fixed parameter).
+* When you have knowledge on the exact size of K (= set as a fixed parameter).
 ```
-result <- freqpcr(  dmy_cq@N,
-                    dmy_cq@housek0, dmy_cq@target0, dmy_cq@housek1, dmy_cq@target1,
-                    baseChange=0.3,
+result <- freqpcr(  N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0, 
+                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
+                    K=4,
                     EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=1  )
 ```
 
