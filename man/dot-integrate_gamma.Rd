@@ -26,15 +26,15 @@
 
 \item{SHS}{The gamma shape parameters for the wild (S) portion of the bulk samples. Should be the same length as del. Each element of SHS is defined as K*(the assumed number of S allele in the bulk sample).}
 
-\item{zeroAmount}{(In RED-\eqn{\Delta\Delta}Cq method) residual rate of restriction enzyme digestion, or (in general \eqn{\Delta\Delta}Cq analyses) small portion of the off-target allele amplified in the PCR process. It needs to be always specified by the user as a number between 0 and 1, usually near 0.}
+\item{zeroAmount}{(In RED-\eqn{\Delta\Delta}Cq method) residue rate of restriction enzyme digestion, or (in general \eqn{\Delta\Delta}Cq analyses) small portion of the off-target allele on the target locus of the test sample, which will be amplified in the PCR. It needs to be always specified by the user as a number between 0 and 1, usually near 0.}
 
-\item{targetScale}{(\eqn{\delta_{T}}) The relative template DNA amount of the target locus to the houskeeping locus. If known, given as a positive numeric.}
+\item{targetScale}{(\eqn{\delta_{T}}) Scalar. The relative template DNA amount of the target locus to the houskeeping locus. If known, given as a positive numeric.}
 
-\item{sdMeasure}{(\eqn{\sigma_{c}}) The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
+\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
 
 \item{xsm}{Specify the accumulation of the standard deviation of the Cq measuring errors when the *-Cq values are fed as difference. For \eqn{\Delta}Cq values, sdMeasure times two. For \eqn{\Delta\Delta}Cq, sdMeasure times four. Default is used in most cases.}
 
-\item{EPCR}{(\eqn{\eta}) Amplification efficiency per PCR cycle. If known, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).}
+\item{EPCR}{(\eqn{\eta}) Scalar. Amplification efficiency per PCR cycle. If known, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).}
 
 \item{cubmethod}{Cubature method passed to the integrator function. See the section "Methods for cubintegrate".}
 

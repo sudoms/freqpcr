@@ -1,7 +1,7 @@
 Type: Package
 Package: freqpcr
 Title: Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples
-Version: 0.3.1
+Version: 0.3.2
 Authors@R: c(
     person(given="Masaaki", family="Sudo", email="masaaki@sudori.info", role=c("aut", "cre"), comment=c(ORCID="0000-0001-9834-9857"))
     )
@@ -9,7 +9,7 @@ Author: Masaaki Sudo [aut, cre]
 Maintainer: Masaaki Sudo <masaaki@sudori.info>
 Description: Interval estimation of the population allele frequency from qPCR analysis based on the restriction enzyme digestion (RED)-DeltaDeltaCq method (Osakabe et al. 2017), as well as general DeltaDeltaCq analysis. Compatible with the Cq measurement of DNA extracted from multiple individuals at once, so called "group-testing", this model assumes that the quantity of DNA extracted from an individual organism follows a gamma distribution. Therefore, the point estimate is robust regarding the uncertainty of the DNA yield.
 URL: https://github.com/sudoms/freqpcr
-Depends: R (>= 3.4), cubature
+Depends: R (>= 3.6), cubature
 Imports: methods
 License: GPL (>=3)
 Encoding: UTF-8

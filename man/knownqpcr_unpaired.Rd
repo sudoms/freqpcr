@@ -5,11 +5,11 @@
 \title{Estimate auxiliary parameters when the sample pairs are incomplete.}
 \usage{
 knownqpcr_unpaired(
-  A,
-  trueY,
-  Gene,
   Digest,
+  Gene,
+  trueY,
   Cq,
+  A = rep(1, length(Cq)),
   XInit = c(meanDNA = -10, targetScale = 0, baseChange = 0, sdMeasure = 1, zeroAmount =
     -5, EPCR = 0),
   method = "BFGS",
@@ -20,15 +20,15 @@ knownqpcr_unpaired(
 )
 }
 \arguments{
-\item{A}{Sample sizes as a numeric vector.}
+\item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. In the RED-\eqn{\Delta\Delta}Cq method, it specify the test sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all elements must be marked 1, which trigger the exclusion of \code{baseChange} from the estimation process. NA is not allowed.}
 
-\item{trueY}{A numeric vector of the same length as \code{A}. \code{trueY[i]} signifies the true frequency of the mutant allele in the \emph{i}th bulk sample. The values must be between 0 and 1.}
+\item{Gene}{Numeric vector that specify the amplified gene is housekeeping (= 0) or target (= 1). NA is not allowed.}
 
-\item{Gene}{Numeric vector that specify the gene is housekeeping (= 0) or target (= 1), having the same length as \code{A} and \code{trueY}.}
+\item{trueY}{A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be added to your experimental design.}
 
-\item{Digest}{Numeric vector having the same length as \code{A} and \code{trueY}. It specify the gene is intact (= 0) or digested with endonuclease (= 1) in the RED-\eqn{\Delta\Delta}Cq method. In general \eqn{\Delta\Delta}Cq analyses, the argument means all the alleles on the target locs will be amplified (= 0) (it has ) or only the R portion will be amplified (using an R-specific primer set).}
+\item{Cq}{Measured Cq values. NAs are allowed, and then the data vectors are trimmed internally.}
 
-\item{Cq}{Measured Cq values. Numeric vectors having the same length as \code{A} and \code{trueY}.}
+\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
 
 \item{XInit}{A named vector specifying the initial sizes of the auxiliary parameters in the optimization. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.}
 
@@ -40,18 +40,18 @@ knownqpcr_unpaired(
 
 \item{report}{The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.}
 
-\item{quiet}{Suppress the output of the function sent to stdout? The default is \code{FALSE}.}
+\item{quiet}{Suppress the output of the function sent to stdout?.}
 }
 \value{
 A table containing the estimated parameter values, which is same as \code{\link{knownqpcr}()}.
 }
 \description{
-A variant of \code{\link{knownqpcr}()} is used to estimate the auxiliary parameters when the exact mixing ratios are known for each sample. However, qPCR analyses are only conducted for part of the sample sets. To deal with cases where the combination of the four Cq measurements are incomplete (thus the data lengths of \code{housek0}, \code{target0}, \code{housek1}, and \code{target1} are different), the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Gene} and \code{Digest}).
+A variant of \code{\link{knownqpcr}()} used when the qPCR analyses are only conducted for part of the sample sets (i.e., the combination of the four Cq measurements has missing values). To deal with the situation, the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.
 }
 \examples{
-# A dummy Cq dataset: four mixing ratios (0.1, 0.25, 0.5, 1) with four replicates.
-# Settings: targetScale=1.5, baseChange=0.3, EPCR=0.95, zeroAmount=1e-3, sdMeasure=0.3
-
+# A dummy Cq dataset: four mixing ratios with four replicates.
+# K:2, scaleDNA:1e-11, targetScale:1.5, baseChange:0.3, zeroAmount:1e-3,
+# sdMeasure:0.3, and EPCR:0.95. Assuming a RED-DeltaDeltaCq analyses.
 trueY <- c(rep(0.1, 4), rep(0.25, 4), rep(0.5, 4), rep(1, 4))
 housek0 <- c( 19.39, 19.78, 19.28, 19.58,  18.95, 19.91, 19.66, 19.96,
               20.05, 19.86, 19.55, 19.61,  19.86, 19.27, 19.59, 20.21 )
@@ -62,26 +62,23 @@ housek1 <- c( 21.61, 21.78, 21.25, 21.07,  22.04, 21.45, 20.72, 21.6,
 target1 <- c( 24.3, 24.22, 24.13, 24.13,   22.74, 23.14, 23.02, 23.14,
               21.65, 22.62, 22.28, 21.65,  20.83, 20.82, 20.76, 21.3 )
 
-# Complete observation: "wide" format.
-d.cmp <- data.frame(A=rep(1, 16), trueY, housek0, target0, housek1, target1)
-print(d.cmp)
-p.cmp <- knownqpcr( d.cmp$A, d.cmp$trueY,
-                    d.cmp$housek0, d.cmp$target0, d.cmp$housek1, d.cmp$target1 )
-print(p.cmp)
-
-# Incomplete observation: prepared in the "long" format.
-# Undegested (housek0 and target0) samples are analyzed only for trueY == 1.
-d.long <- data.frame(
-    A=rep(1, 4+4+16+16),
-    Gene=c(rep(0, 4), rep(1, 4), rep(0, 16), rep(1, 16)),
-    Digest=c(rep(0, 4+4), rep(1, 16+16)),
-    trueY=c(rep(1, 8), rep(c(rep(0.1, 4), rep(0.25, 4), rep(0.5, 4), rep(1, 4)), 2)),
-    Repl=rep(1:4, 1+1+4+4),
-    Cq=c(housek0[13:16], target0[13:16], housek1, target1))
+# Incomplete observation dataset, prepared as the "long" format.
+# If the undegested (Digest == 0) samples were only analyzed when trueY == 1.
+d.long.all <- data.frame(
+    trueY=rep(trueY, 4), Digest=c(rep(0, 16 + 16), rep(1, 16 + 16)),
+    Gene=c(rep(0, 16), rep(1, 16), rep(0, 16), rep(1, 16)),
+    A=rep(1, 16*4), Cq=c(housek0, target0, housek1, target1)  )
+d.long <- d.long.all[d.long.all$Digest == 1 | d.long.all$trueY == 1, ]
 print(d.long)
-p.long <- knownqpcr_unpaired( d.long$A, d.long$trueY,
-                              d.long$Gene, d.long$Digest, d.long$Cq )
-print(p.long)
+
+knownqpcr_unpaired( Digest=d.long$Digest, Gene=d.long$Gene,
+                    trueY=d.long$trueY, Cq=d.long$Cq, A=d.long$A )
+
+# In general DeltaDeltaCq analyses, the experimental design will not include
+# dedicated control samples (Digest == 0).
+d.long <- d.long.all[d.long.all$Digest == 1, ]
+knownqpcr_unpaired( Digest=d.long$Digest, Gene=d.long$Gene,
+                    trueY=d.long$trueY, Cq=d.long$Cq, A=d.long$A )
 }
 \seealso{
 Other estimation procedures: 

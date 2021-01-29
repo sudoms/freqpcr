@@ -22,41 +22,41 @@ make_dummy(
 \arguments{
 \item{rand.seed}{Seed for the R built-in random-number-generator.}
 
-\item{P}{Population allele frequency from which the test samples are generated. It is given as a numeric between 0 and 1.}
+\item{P}{A numeric between 0 and 1 giving the population allele frequency from which the test samples are generated.}
 
-\item{K}{The gamma shape parameter of the individual DNA yield, given as a positive numeric.}
+\item{K}{A positive numeric of the gamma shape parameter of the individual DNA yield.}
 
-\item{ntrap, npertrap}{Scalar specifying the number of bulk samples (\code{ntrap}) and the numbers of individuals contained in each bulk sample (\code{npertrap}). Currently limited to the cases all bulk samples have the same sample size e.g. (4+4+4) when \code{ntrap = 3} and \code{npertrap = 4} hold.}
+\item{ntrap, npertrap}{Scalar specifying the number of bulk samples (\code{ntrap}) and the numbers of individuals contained in each bulk sample (\code{npertrap}). Currently limited to the cases that all bulk samples have the same sample size: e.g. (4 + 4 + 4) when \code{ntrap = 3} and \code{npertrap = 4} hold.}
 
-\item{scaleDNA}{Small positive scalar that specifies the scale parameter of the gamma distribution appriximating the DNA yield from (per-haploid) individual. The yield of \code{2*scaleDNA} is expected from a diploid. The quantity is determined as the relative amount (in linear scale) to the termination threshold of the realtime PCR cycle.}
+\item{scaleDNA}{Small positive scalar that specifies the scale parameter of the gamma distribution appriximating the DNA yield from (per-haploid) individual. The yield of \code{2*scaleDNA} is expected from a diploid. The quantity is determined as the relative amount, in linear scale, to the termination threshold of the real-time PCR.}
 
-\item{targetScale}{(\eqn{\delta_{T}}) The relative template DNA amount of the target locus to the houskeeping locus, given as a positive numeric.}
+\item{targetScale}{(\eqn{\delta_{T}}) The relative template DNA amount of the target gene to the houskeeping gene, given as a positive numeric.}
 
-\item{baseChange}{(\eqn{\delta_{B}}) The change rate in the template DNA quantities after the restriction enzyme digestion (in the RED-delta delta Cq method), given as a positive numeric. This parameter is not present in \code{\link{freqpcr}()}, but essential for \code{\link{knownqpcr}()} and \code{\link{make_dummy}()}.}
+\item{baseChange}{(\eqn{\delta_{B}}) The change rate in the template DNA quantities after the restriction enzyme digestion (in the RED-\eqn{\Delta\Delta}Cq method), given as a positive numeric. This parameter is not used in \code{\link{freqpcr}()}.}
 
 \item{EPCR}{(\eqn{\eta}) Amplification efficiency per PCR cycle, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).}
 
-\item{zeroAmount}{(In RED-\eqn{\Delta\Delta}Cq method) residual rate of restriction enzyme digestion, or (in general \eqn{\Delta\Delta}Cq analyses) small portion of the off-target allele amplified in the PCR process. It needs to be always specified by the user as a number between 0 and 1, usually near 0.}
+\item{zeroAmount}{A numeric between 0 and 1, usually near 0, giving the residue rate of restriction enzyme digestion in RED-\eqn{\Delta\Delta}Cq method.}
 
-\item{sdMeasure}{(\eqn{\sigma_{c}}) The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}), given as a positive number.}
+\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
 
-\item{diploid}{Is the target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation on the diploids assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote, which is unlikely in many animals but necessary for the calculation in a realistic time.}
+\item{diploid}{The target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote individual, which is unlikely in many animals but necessary for the calculation in a realistic time.}
 }
 \value{
 Object of the S4 class \linkS4class{CqList}, storing the dummy experiment data of Cq-based qPCR analysis. Note that a \linkS4class{CqList} object in no way contains original information on \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}.
 }
 \description{
-The function generates a dummy dataset of the Cq values. You can directly feed the output of this function to the first argument of \code{\link{sim_dummy}()}.
+The function generates a dummy dataset of typical RED-\eqn{\Delta\Delta}Cq analysis. You can directly feed the output of this function to the first argument of \code{\link{sim_dummy}()}.
 }
 \examples{
 P <- 0.25
-# Calculate the segregation ratios for six bulk samples (1000 individuals for each).
+# Just a test: segregation ratios for six bulk samples, 1000 individuals for each.
 rmultinom(n=6, size=1000, prob=c(P, 1-P)) # haploidy
 rmultinom(6, size=1000, prob=c(P^2, 2*P*(1-P), (1-P)^2)) # diploidy
 
-# Dummy Cq dataset with six bulk samples, each of which comprises of eight haploids.
-dmy_cq <- make_dummy( rand.seed=1, P=0.75, K=2, ntrap=6, npertrap=8, scaleDNA=1e-07,
-                      targetScale=1.5, baseChange=0.3, EPCR=0.95, zeroAmount=1e-3,
-                      sdMeasure=0.3, diploid=FALSE )
+# Dummy Cq dataset with six bulk samples, each of which comprises eight haploids.
+dmy_cq <- make_dummy( rand.seed=1, P=0.15, K=2, ntrap=6, npertrap=8,
+                      scaleDNA=1e-07, targetScale=1.5, baseChange=0.3, EPCR=0.95,
+                      zeroAmount=1e-3, sdMeasure=0.3, diploid=FALSE )
 print(dmy_cq)
 }
