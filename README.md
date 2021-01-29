@@ -212,5 +212,5 @@ GNU GPL (>= 3)
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # History
-* v0.3.2 (2021.01.26) Fixed: R version ~~2.14~~ -> 3.6 and higher
+* v0.3.2 (2021.01.29) Fixed: R version ~~2.14~~ -> 3.6 and higher
 * v0.3.1 (2021.01.20) First published (first draft of the preprint)
