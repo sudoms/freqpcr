@@ -37,7 +37,7 @@ packageVersion("freqpcr")
 library(freqpcr)
 ```
 
-## First, define the parameters
+## First, define the parameters for dummy data generation
 ```
 P <- 0.15
 K <- 4
@@ -181,7 +181,7 @@ result <- freqpcr(  N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
 # Note
 * Download PDF help of the latest release https://github.com/sudoms/freqpcr/releases/latest
 * Preprint is available from bioRxiv https://doi.org/10.1101/2021.01.19.427228
-* Simulation dataset: https://figshare.com/account/home#/collections/5258027
+* Simulation dataset (using v0.3.1): https://figshare.com/account/home#/collections/5258027
 
 
 # citation
@@ -212,5 +212,6 @@ GNU GPL (>= 3)
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # History
+* v0.3.3 (2021.02.13) Continuous distribution in sample allele ratio was supported. knownqpcr() function now officially accepts missing Cq observations (NA).
 * v0.3.2 (2021.01.29) Fixed: R version ~~2.14~~ -> 3.6 and higher
 * v0.3.1 (2021.01.20) First published (first draft of the preprint)

@@ -1,31 +1,34 @@
 # 03 known ratio
 
 
+# todo: introduce the random error structure for the Cq quartet (in which scale?).
+
+
 #' @title Estimate auxiliary parameters using samples with known allele ratios.
 #'
-#' @description The function to estimate the auxiliary experimental parameters using DNA solutions, provided the dataset contains samples with multiple allele mixing ratios and the exact mixing ratio are known for each sample. This function is used when all replicates in the  dataset comprise the complete observations on the \eqn{2 \times 2} combinations of the qPCR conditions in a RED-\eqn{\Delta\Delta}Cq analysis: (loci for target-gene or housekeeping-gene) and (the target gene is undigested or digested with endonuclease).
+#' @description The function to estimate the auxiliary experimental parameters using DNA solutions, provided the dataset contains samples with multiple allele mixing ratios and the exact mixing ratio are known for each sample. This function is used when all replicates in the  dataset comprise the complete observations on the \eqn{2 \times 2} combinations of the qPCR conditions in a RED-\eqn{\Delta\Delta}Cq analysis: (loci for target or housekeeping genes) and (the target gene is undigested or digested with endonuclease). The quartet of the four Cq data, \code{housek0}, \code{target0} (these two are undigested samples amplified with housekeeping and target genes, respectively), \code{housek1}, and \code{target1} (digested samples) should be prepared as four numeric vectors having the same length.
 #' \cr
-#' The quartet of the four Cq data, \code{housek0}, \code{target0} (these two are undigested), \code{housek1}, and \code{target1} (they are digested) should be prepared as four numeric vectors having the same length. If the \eqn{2 \times 2} combination is not complete, use another function, \code{\link{knownqpcr_unpaired}()}, where you can deal with situations, for example, only a part of the undigested sample was quantified.
+#' One more variable, \code{trueY} is needed to run the estimation process; it a numeric vector having the same length with the four Cq data. It holds the exact allele-mixing ratio for each quartet (also see the code example). Optionally, you can adjust the relative DNA concentration between the replicates with a parameter vector \code{A}.
 #' \cr
-#' One more variable, \code{trueY} is needed to run the estimation process; it a numeric vector having the same length with the four Cq data. It holds the exact allele-mixing ratio for each quartet (also see the code example). Optionally, you can fix the relative DNA concentration between the replicates with a parameter vector \code{A}.
+#' The \code{\link{knownqpcr}()} function can also deal with general \eqn{\Delta\Delta}Cq analyses. In such cases, samples with any mixing ratios should be marked as `digested samples' i.e., either of  \code{housek1} or \code{target1}, depending on the loci to be amplified. The arguments of the corresponding undigested samples, \code{housek0} and \code{target0}, are not specified. Then, the parameter \code{baseChange} (\eqn{\delta_{B}}: the change rate of DNA contents before/after the endonuclease digestion) is not included in the estimation result.
 #' \cr
-#' The \code{\link{knownqpcr}()} function can also deal with general \eqn{\Delta\Delta}Cq analyses. In such cases, samples with any mixing ratios should be marked as `digested samples' i.e., either of  \code{housek1} or \code{target1}, depending on the loci to be amplified. The arguments of the corresponding undigested samples, \code{housek0} and \code{target0}, are not required. The parameter \code{baseChange} (the change rate of DNA contents before/after the endonuclease digestion) is then not included in the estimation result. You can also use \code{\link{knownqpcr_unpaired}()} to analyze general \eqn{\Delta\Delta}Cq data.
-#' @param housek0,target0,housek1,target1 Measured Cq values. Numeric vectors having the same length as \code{A} and \code{trueY}. Any of the values should not be duplicated (any single Cq measure must not be recycled). If the Cq dataset has missing values, there are two ways. 1) Specify missing values explicitly as NA and use \code{\link{knownqpcr}()}, or 2) Use another function \code{\link{knownqpcr_unpaired}()}.
+#' You can also use another function, \code{\link{knownqpcr_unpaired}()}, to analyze RED-\eqn{\Delta\Delta}Cq or general \eqn{\Delta\Delta}Cq data.
+#' @param housek0,target0,housek1,target1 Measured Cq values. Numeric vectors having the same length as \code{trueY} and \code{A} (if present). Any of the values should not be duplicated (any single Cq measure must not be recycled). If the Cq dataset has missing values, there are two ways. 1) Fill the missing values explicitly with NA and use \code{\link{knownqpcr}()}, or 2) Use another function \code{\link{knownqpcr_unpaired}()}, which can accept the Cq data in the `long' format.
 #' \cr
-#' In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} corresponds to the intact test samples (not digested with endonuclease) amplified with the primer sets for housekeeping- and target-loci, respectively. In general \eqn{\Delta\Delta}Cq analyses, no samples are marked as \code{housek0} or \code{target0} by the user (only \code{housek1} and \code{target1} should be input).
-#' @param trueY A numeric vector having the same length as the Cq data vectors. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1. To improve the estimation accuracy, y == 1 (pure mutant solution) should be added to your experimental design.
-#' @param A Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data vectors. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).
+#' In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} corresponds to the intact test samples (not digested with endonuclease) amplified with the primer sets for housekeeping- and target-loci, respectively. In general \eqn{\Delta\Delta}Cq analyses, no samples are marked as \code{housek0} or \code{target0} by the user and only \code{housek1} and \code{target1} should be input. It triggers the exclusion of \code{baseChange} from the estimation process.
+#' @param trueY A numeric vector having the same length as the Cq data vectors. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.
+#' @param A Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data vectors. It is the counterpart of the \code{N} or \code{A} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).
 #' @param XInit A named vector specifying the initial sizes of the auxiliary parameters in the optimization. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.
 #' @param method A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.
 #' @param trace Non-negative integer. If positive, \code{\link[stats]{optim}()} outputs trace information. The default is 0 (no information).
 #' @param report The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.
-#' @param quiet Suppress the output of the function sent to stdout?.
+#' @param quiet Suppress the output of the function sent to stdout?
 #' @inheritParams freqpcr
 #' @return A table containing the estimated values for the following parameters:
 #' \enumerate{
 #'     \item\code{meanDNA} is the template DNA concentration (of housekeeping gene, per unit volume of sample solution) compared to the threshold line of PCR.
 #'     \item\code{targetScale} (\eqn{\delta_{T}}) is the relative template DNA amount of the target to the houskeeping loci.
-#'     \item\code{baseChange} (\eqn{\delta_{B}}) is the change rate in the DNA amount after endonuclease digestion (in RED-\eqn{\Delta\Delta}Cq method). In general \eqn{\Delta\Delta}Cq analyses (neither \code{housek0} nor \code{target0} is input), this parameter is not returned. In both cases, \code{baseChange} is not used in \code{\link{freqpcr}()}.
+#'     \item\code{baseChange} (\eqn{\delta_{B}}) is the change rate in the DNA amount after endonuclease digestion (in RED-\eqn{\Delta\Delta}Cq method). In general \eqn{\Delta\Delta}Cq analyses (neither \code{housek0} nor \code{target0} is input), this parameter is not returned. In both cases, \code{baseChange} is not required to run \code{\link{freqpcr}()}.
 #'     \item\code{sdMeasure} (\eqn{\sigma_{c}}) is the measurement error (standard deviation) at each Cq value.
 #'     \item\code{EPCR} (\eqn{\eta}) is the amplification efficiency per PCR cycle.
 #' }
@@ -47,7 +50,7 @@
 #'
 #' knownqpcr(  housek0=d.cmp$housek0, target0=d.cmp$target0,
 #'             housek1=d.cmp$housek1, target1=d.cmp$target1,
-#'             trueY=d.cmp$trueY, A=d.cmp$A   )
+#'             trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE  )
 #'
 #' # In general DeltaDeltaCq analyses, the experimental design will not include
 #' # dedicated control samples. The function then runs without 'housek0' and 'target0'.
@@ -71,7 +74,7 @@ knownqpcr <- function(  housek1, target1, housek0=NULL, target0=NULL, trueY, A=r
         quartet <- FALSE
         # The parameter 'baseChange' is not defined for duo. It is the case in general DeltaDeltaCq analyses.
         XInit <- XInit[names(XInit) != "baseChange"]
-        cat("\nEither the arguments housek0 or target0 was not specified. 'baseChange' will not be estimated.\n")
+        cat("\nEither the argument housek0 or target0 was not specified. 'baseChange' will not be estimated.\n")
     } else {
         if (!all(length(housek1), length(target1), length(housek0), length(target0))) {
             stop(paste( "Error: when you input the RED-DeltaDeltaCq dataset in the 'paired' format, \n",
@@ -81,38 +84,59 @@ knownqpcr <- function(  housek1, target1, housek0=NULL, target0=NULL, trueY, A=r
     }
 
     if (quartet) {
+        # Homogeneity of the data length was verified. Trim the missing data element.
+        data.matrix <- cbind(trueY, A, housek0, target0, housek1, target1)
+        is.na.data <- is.na(rowSums(data.matrix))
+        if (quiet==FALSE) {
+            print(data.matrix)
+            cat("\nThe data row contains missing value? If TRUE, the row will be omitted before the model fitting.\n")
+            print(is.na.data)
+        }
+        housek0 <- housek0[!is.na.data]
+        target0 <- target0[!is.na.data]
+        housek1 <- housek1[!is.na.data]
+        target1 <- target1[!is.na.data]
+        trueY <- trueY[!is.na.data]
+        A <- A[!is.na.data]
+
         Cq.long <- c(housek0, target0, housek1, target1)
         A.long <- rep(A, 4)
         Y.long <- rep(trueY, 4)
         Gene <- c(rep(0, length(housek0)), rep(1, length(target0)), rep(0, length(housek1)), rep(1, length(target1)))
         Digest <- c(rep(0, length(housek0) + length(target0)), rep(1, length(housek1) + length(target1)))
     } else {
+        data.matrix <- cbind(trueY, A, housek1, target1)
+        is.na.data <- is.na(rowSums(data.matrix))
+        if (quiet==FALSE) {
+            print(data.matrix)
+            cat("\nThe data row contains missing value? If TRUE, the row will be omitted before the model fitting.\n")
+            print(is.na.data)
+        }
+        housek1 <- housek1[!is.na.data]
+        target1 <- target1[!is.na.data]
+        trueY <- trueY[!is.na.data]
+        A <- A[!is.na.data]
+
         Cq.long <- c(housek1, target1)
         A.long <- rep(A, 2)
         Y.long <- rep(trueY, 2)
         Gene <- c(rep(0, length(housek1)), rep(1, length(target1)))
         Digest <- rep(1, length(housek1) + length(target1))
-        # If there is a data of Y == 1, it is automatically re-assigned to Digest == 0 (control sample).
-        # Note that the data structure is 'duo' where the data lengths of the test sample and control can differ.
-        Digest[Y.long==1] <- 0
-        if (any(Y.long==1)) {
-            cat("There are test samples with trueY == 1.",
-                "They are assigned internally to Digest == 0 (control sample).\n", sep=" ")
-        }
-    }
-    A.long <- A.long[!is.na(Cq.long)]
-    Y.long <- Y.long[!is.na(Cq.long)]
-    Gene <- Gene[!is.na(Cq.long)]
-    Digest <- Digest[!is.na(Cq.long)]
-    Cq.long <- Cq.long[!is.na(Cq.long)] # trimming of Cq must comes last.
 
-    if(quiet==FALSE) {
-        cat("\n", "Dataset internally used to estimation:", "\n", sep="")
-        data.matrix <- cbind(Y.long, Digest, Gene, A.long, Cq.long)
-        colnames(data.matrix) <- c( "Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
-                                    "Rel_DNA_content", "Cq" )
-        print(data.matrix, max=ncol(data.matrix)*200)
-        cat("\n")
+        # If there is a data of Y == 1, it is automatically re-assigned to Digest == 0 (control sample).
+        # Note that the data lengths of the test sample and control can differ only the when structure is 'duo'.
+        Digest[Y.long==1] <- 0
+        if (quiet==FALSE) {
+            if (any(Y.long==1)) {
+                cat("\nThere are test samples with trueY == 1.",
+                    "They are re-assigned internally to Digest == 0 (control sample).\n", sep=" ")
+            }
+            data.matrix2 <- cbind(Y.long, Digest, Gene, A.long, Cq.long)
+            colnames(data.matrix2) <- c( "Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
+                                        "Rel_DNA_content", "Cq" )
+            cat("Dataset internally used to estimation:\n")
+            print(data.matrix2, max=ncol(data.matrix2)*200)
+        }
     }
 
     if (quartet) {
@@ -164,17 +188,17 @@ knownqpcr <- function(  housek1, target1, housek0=NULL, target0=NULL, trueY, A=r
 
 #' @title Estimate auxiliary parameters when the sample pairs are incomplete.
 #'
-#' @description A variant of \code{\link{knownqpcr}()} used when the qPCR analyses are only conducted for part of the sample sets (i.e., the combination of the four Cq measurements has missing values). To deal with the situation, the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.
+#' @description A variant of \code{\link{knownqpcr}()} that accepts the Cq values concatenated into a vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.
 #' @param Digest Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. In the RED-\eqn{\Delta\Delta}Cq method, it specify the test sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all elements must be marked 1, which trigger the exclusion of \code{baseChange} from the estimation process. NA is not allowed.
-#' @param Gene Numeric vector that specify the amplified gene is housekeeping (= 0) or target (= 1). NA is not allowed.
-#' @param trueY A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be added to your experimental design.
-#' @param Cq Measured Cq values. NAs are allowed, and then the data vectors are trimmed internally.
+#' @param Gene Numeric vector that specify each Cq measure (element of \code{Cq}) was taken with housekeeping (= 0) or target (= 1) locus. NA is not allowed.
+#' @param trueY A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.
+#' @param Cq Measured Cq values. NAs are allowed (but the vector length must be the same as \code{Digest}, \code{Gene}, and \code{trueY}), and then the data vector is trimmed internally.
 #' @param A Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).
 #' @param XInit A named vector specifying the initial sizes of the auxiliary parameters in the optimization. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.
 #' @param method A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.
 #' @param trace Non-negative integer. If positive, \code{\link[stats]{optim}()} outputs trace information. The default is 0 (no information).
 #' @param report The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.
-#' @param quiet Suppress the output of the function sent to stdout?.
+#' @param quiet Suppress the output of the function sent to stdout?
 #' @inheritParams freqpcr
 #' @return A table containing the estimated parameter values, which is same as \code{\link{knownqpcr}()}.
 #' @examples
@@ -214,43 +238,48 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
                                 XInit=c(meanDNA=-10, targetScale=0, baseChange=0, sdMeasure=1, zeroAmount=-5, EPCR=0),
                                 method="BFGS", pvalue=0.05, trace=0, report=10, quiet=FALSE ) {
 
-    arg.len <- all(length(Digest), length(Gene), length(trueY), length(Cq))
+    arg.len <- all(length(Digest), length(Gene), length(trueY), length(Cq), length(A))
     if (!arg.len) {
-        stop(paste("Error: the arguments Digest, Gene, trueY, and Cq must have the same length."))
+        stop(paste("Error: the arguments Digest, Gene, trueY, Cq, and A must have the same length."))
     }
     quartet <- TRUE
-    if (min(Digest)>0) {
+    if (min(Digest, na.rm=TRUE)>0) {
         # If all the samples are marked as "digested," then the dataset is treated as "duo."
         quartet <- FALSE
         # The parameter 'baseChange' is not defined for duo. It is the case in general DeltaDeltaCq analyses.
         XInit <- XInit[names(XInit) != "baseChange"]
         cat("\nAs all samples are marked `digested', `baseChange' will not be estimated.\n")
     }
+    # Trim the missing data element.
+    data.matrix <- cbind(trueY, Digest, Gene, A, Cq)
+    is.na.data <- is.na(rowSums(data.matrix))
+    if (quiet==FALSE) {
+        print(data.matrix)
+        cat("\nThe data row contains missing value? If TRUE, the row will be omitted before the model fitting.\n")
+        print(is.na.data)
+    }
+    Digest <- Digest[!is.na.data]
+    Gene <- Gene[!is.na.data]
+    Y.long <- trueY[!is.na.data]
+    A.long <- A[!is.na.data]
+    Cq.long <- Cq[!is.na.data]
 
-    Digest <- Digest[!is.na(Cq)]
-    Gene <- Gene[!is.na(Cq)]
-    Y.long <- trueY[!is.na(Cq)]
-    A.long <- A[!is.na(Cq)]
-    Cq.long <- Cq[!is.na(Cq)] # trimming of Cq must comes last.
-
-    # ここは必要なのか？
     if (!quartet) {
         # If there is a data of Y == 1, it is automatically re-assigned to Digest == 0 (control sample).
-        # Note that the data structure is 'duo' where the data lengths of the test sample and control can differ.
+        # This operation accelerates the convergence of targetScale.
+        # Note that the data structure is 'duo', and then the data lengths of the test sample and control can differ.
         Digest[Y.long==1] <- 0
-        if (any(Y.long==1)) {
-            cat("There are test samples with trueY == 1.",
-                "They are assigned internally to Digest == 0 (control sample).\n", sep=" ")
+        if (quiet==FALSE) {
+            if (any(Y.long==1)) {
+                cat("\nThere are test samples with trueY == 1.",
+                    "They are re-assigned internally to Digest == 0 (control sample).\n", sep=" ")
+            }
+            data.matrix2 <- cbind(Y.long, Digest, Gene, A.long, Cq.long)
+            colnames(data.matrix2) <- c( "Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
+                                        "Rel_DNA_content", "Cq" )
+            cat("Dataset internally used to estimation:\n", sep="")
+            print(data.matrix2, max=ncol(data.matrix2)*200)
         }
-    }
-
-    if(quiet==FALSE) {
-        cat("\n", "Dataset internally used to estimation:", "\n", sep="")
-        data.matrix <- cbind(Y.long, Digest, Gene, A.long, Cq.long)
-        colnames(data.matrix) <- c( "Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
-                                    "Rel_DNA_content", "Cq" )
-        print(data.matrix, max=ncol(data.matrix)*200)
-        cat("\n")
     }
 
     if (quartet) {
@@ -260,15 +289,15 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
         qvalue <- -qnorm(p=pvalue/2, mean=0, sd=1) # if pvalue=0.05, it returns 2.5 percentile of N(0, 1)
 
         result <- matrix(rep(Z$par[1:6], each=3), ncol=3, byrow=TRUE)
-        result[, 2] <- result[, 2]-qvalue*SE
-        result[, 3] <- result[, 3]+qvalue*SE
-        result <- exp(result)
         rownames(result) <- c(  "meanDNA (DNA content per unit)",
                                 "targetScale (rel. target content)",
                                 "baseChange (after digestion)", # baseChange is only estimated in quartet
                                 "SD (Cq measurement error)",
                                 "zeroAmount (S-target after digestion)",
                                 "EPCR (PCR multiplification efficiency)"  )
+        result[, 2] <- result[, 2]-qvalue*SE
+        result[, 3] <- result[, 3]+qvalue*SE
+        result <- exp(result)
     } else {
         Z <- optim( par=XInit, fn=.knownqpcr_loglike_duo, gr=NULL, A.long, Y.long, Digest, Gene, Cq.long,
                     method=method, control=list(fnscale=-1, trace=trace, REPORT=report), hessian=TRUE )
@@ -276,14 +305,14 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
         qvalue <- -qnorm(p=pvalue/2, mean=0, sd=1) # if pvalue=0.05, it returns 2.5 percentile of N(0, 1)
 
         result <- matrix(rep(Z$par[1:5], each=3), ncol=3, byrow=TRUE)
-        result[, 2] <- result[, 2]-qvalue*SE
-        result[, 3] <- result[, 3]+qvalue*SE
-        result <- exp(result)
         rownames(result) <- c(  "meanDNA (DNA content per unit)",
                                 "targetScale (rel. target content)",
                                 "SD (Cq measurement error)",
                                 "zeroAmount (S-target after digestion)",
                                 "EPCR (PCR multiplification efficiency)"  )
+        result[, 2] <- result[, 2]-qvalue*SE
+        result[, 3] <- result[, 3]+qvalue*SE
+        result <- exp(result)
     }
     colnames(result) <- c(  "Estimate",
                             paste(deparse(100*   pvalue/2) , "%", sep=""),

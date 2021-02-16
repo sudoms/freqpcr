@@ -39,7 +39,7 @@ sim_dummy(
 Object of the S4 class \linkS4class{CqFreq}, which is same as \code{\link{freqpcr}()}.
 }
 \description{
-Wrapper of \code{\link{freqpcr}()} suitable for the performance test the using randomly-generated data object.
+Wrapper of \code{\link{freqpcr}()} suitable for the performance test using a randomly-generated data object.
 }
 \examples{
 # Prepare the parameter values.

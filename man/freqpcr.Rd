@@ -30,9 +30,9 @@ freqpcr(
 )
 }
 \arguments{
-\item{N}{Sample sizes as a numeric vector. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample. If \code{N} is not applicable (= even not 1), feed \code{A} instead of \code{N} and then the estimation process runs with the `continuous model'.}
+\item{N}{Sample sizes as a numeric vector. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample. \code{N} must not contain a missing value (\code{NA}). If \code{N} is not applicable (= even not 1), feed \code{A} instead of \code{N} and then the estimation process runs with the `continuous model'.}
 
-\item{A}{Used instead of \code{N} in the continuous model, which is a scale factor to control the relative DNA content between samples. \code{A[i]} can take any positive value. Considering the case you have arranged each sample by e.g. water filrtation or extraction from a culture in a petri dish, it is convenient to define the unit size of \code{A[i]} == 1.0 to be same as the vessel volume (e.g. 2.0 for two petri dishs, 0.5 for half bottle of water, etc.). When neither \code{N} nor \code{A} is specified by the user, the function automatically runs as the continuous model that follows \code{y ~ Beta(pk, (1-p)k)}, where \code{A[i] = 1} is assumed for all samples.}
+\item{A}{Use instead of \code{N} in the continuous model. It is a scale factor to control the relative DNA content between samples. \code{A} must not contain a missing value (\code{NA}). \code{A[i]} can take any positive value. Considering the case you have arranged each sample by e.g. water filrtation or extraction from a culture in a petri dish, it is convenient to define the unit size of \code{A[i]} == 1.0 to be same as the vessel volume (e.g. 2.0 for two petri dishs, 0.5 for half bottle of water, etc.). When neither \code{N} nor \code{A} is specified by the user, the function stops. If both \code{N} and \code{A} are specified, only \code{N} is evaluated.}
 
 \item{housek0}{A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} is the Cq values of the test sample without the restriction enzyme digestion, which is amplified with the primer set for a housekeeping gene. In a general \eqn{\Delta\Delta}Cq analyses, \code{housek0} is defined for the control sample (typically, 100\% mutant) solution, which is also amplified with the primer set for the housekeeping gene.
 \cr
@@ -54,7 +54,7 @@ The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1},
 
 \item{EPCR}{(\eqn{\eta}) Scalar. Amplification efficiency per PCR cycle. If known, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).}
 
-\item{XInit0}{Optionally the initial value for the parameter optimization can be specified, but the user is highly recommended to keep the argument as is. Unlike \code{XInit} in \code{\link{knownqpcr}()}, the argument is not directly passed to the optimizer; each value is used only when the parameter is unknown.}
+\item{XInit0}{Optionally the initial value for the parameter optimization can be specified, but it is highly recommended to keep the argument as is. Unlike \code{XInit} in \code{\link{knownqpcr}()}, the argument is not directly passed to the optimizer; used only when each parameter is set unknown (the parameter value is not set, or specified as NULL).}
 
 \item{zeroAmount}{(In RED-\eqn{\Delta\Delta}Cq method) residue rate of restriction enzyme digestion, or (in general \eqn{\Delta\Delta}Cq analyses) small portion of the off-target allele on the target locus of the test sample, which will be amplified in the PCR. It needs to be always specified by the user as a number between 0 and 1, usually near 0.}
 
@@ -64,7 +64,7 @@ The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1},
 
 \item{pvalue}{The two-sided confidence interval is calculated at the last iteration based on the significance level. Default is 0.05, which returns the 95\% CI (2.5 to 97.5 percentile) based on the Hessian matrix.}
 
-\item{gradtol, steptol, iterlim}{Control parameters passed to \code{\link[stats]{nlm}()}. \code{gradtol} and \code{steptol} are the positive scalars giving the tolerance to terminate the algorithm and the minimum allowable relative step length. \code{iterlim} specifies the maximum number of iterations to be performed before the program is terminated. Usually 30 iterations are enough.}
+\item{gradtol, steptol, iterlim}{Control parameters passed to \code{\link[stats]{nlm}()}. \code{gradtol} and \code{steptol} are the positive scalars giving the tolerance to terminate the algorithm and the minimum allowable relative step length. \code{iterlim} specifies the maximum number of iterations to be performed before the program is terminated (and evaluated at the last iteration). Usually 30 iterations are enough.}
 
 \item{maxtime}{A positive scalar to set the maximum calculation time in seconds to abort the optimizer (and return error). The total calculation time largely depends on \code{N[i]}, the number of individuals contained in each bulk sample.}
 
@@ -83,15 +83,13 @@ Object of the S4 class \linkS4class{CqFreq}. The slot \code{report} is a matrix 
 }
 }
 \description{
-The function estimates the population allele frequency using the dataset of Cq values measured over \code{length(N)} bulk samples, each of which has a sample size of \code{N[i]} as the number of individuals included. \code{N[i]} can be 1, meaning that every individual is analyzed separately. For the \emph{i}th sample, the four Cq values were measured as \code{housek0[i]}, \code{target0[i]}, \code{housek1[i]}, and \code{target1[i]}.
+The function estimates the population allele frequency using the dataset of Cq values measured over \code{length(N)} bulk samples, each of which has a sample size of \code{N[i]} as the number of individuals included. \code{N[i]} can be 1, meaning that every individual is analyzed separately. For the \emph{i}th sample, the four Cq values were measured as \code{housek0[i]}, \code{target0[i]}, \code{housek1[i]}, and \code{target1[i]}. The function can estimate up to five parameters simultaneously when the Cq sets are available for more than two (bulk) samples: \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}.
 \cr
-The function can estimate up to five parameters simultaneously when the Cq sets are available for more than two (bulk) samples: \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}. However, \code{EPCR} is not reliable in many cases the user is encouraged to know the size beforehand by using \code{\link{knownqpcr}()} or \code{\link{knownqpcr_unpaired}()} (either function will return the same result). By default, \code{EPCR} is not estimated unless \code{EPCR = NULL} is specified explicitly.
-\cr
-Since version 0.3.2, the user can also use an experimental `continuous model' by specifying \code{A} instead of \code{N}. That is, each sample DNA is directly extracted from the environment and the sample allele ratio \code{y} follows \code{y ~ Beta(apk, a(1-p)k)} instead of \code{y ~ Beta(mk, (n-m)k), m ~ Binomial(n, p)}, where \code{p} and \code{k} are the population allele frequency and the gamma shape parameter of the individual DNA yield, respectively. The continuous model is likely when each sample directly comes from the environment e.g., water sampling in an eDNA analysis, or cultures in petri dishes.
+Since version 0.3.2, user can also use an experimental `continuous model' by specifying \code{A} instead of \code{N}. That is, each sample DNA is directly extracted from the environment and the sample allele ratio \code{y} follows \code{y ~ Beta(apk, a(1-p)k)} instead of \code{y ~ Beta(mk, (n-m)k), m ~ Binomial(n, p)}, where \code{p} and \code{k} are the population allele frequency and the gamma shape parameter of the individual DNA yield, respectively. Each element of \code{A}, \code{a} is a scaling factor of relative DNA contents between the samples. The continuous model is likely when each sample directly comes from the environment e.g., water sampling in eDNA analyses or cultures of microorganism or cells in petri dishes.
 }
 \section{Choise of the parameters to be estimated}{
 
-Estimation is conducted only for parameters specified, explicitly or implicitly, as \code{NULL}. If one feeds a value e.g. \code{K=1} or \code{sdMeasure=0.24}, it is then treated as fixed parameter.
+Estimation is conducted only for parameters specified, explicitly or implicitly, as \code{NULL}. If one feeds a value e.g. \code{K=1} or \code{sdMeasure=0.24}, it is then treated as fixed parameter. Notwithstanding, \code{EPCR} is only estimated when \code{EPCR = NULL} is specified explicitly.
 \cr
 \code{EPCR} is the amplification efficiency of PCR and usually not estimable from the experiments with unknown allele ratios. You should verify the size of \code{EPCR} and \code{zeroAmount} prior to the experiment with unknown samples. The functions \code{\link{knownqpcr}()} and \code{\link{knownqpcr_unpaired}()} provide the procedure to estimate the sizes of the experimental parameters using the DNA solutions of known allele mixing ratios.
 \cr

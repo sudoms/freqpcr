@@ -17,7 +17,7 @@
 \arguments{
 \item{X}{Numeric vector that stores the parameter values to be optimized via \code{\link{nlm}()}: \code{P} in logit scale and \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR} in log scale.}
 
-\item{A}{Relative DNA content between the samples in the continuous model, as a numeric vector.}
+\item{A}{Relative DNA content between the samples. A continuous version of \code{N} in \code{\link{.freqpcr_loglike}()}, as a numeric vector.}
 
 \item{DCW, DCD}{Numeric vectors. They store the measured values of the two \eqn{\Delta}Cq: \code{DCW (= target0 - housek0)} and \code{DCD (= target1 - housek1)}.}
 
@@ -31,5 +31,5 @@
 Scalar of the log likelihood.
 }
 \description{
-Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct sampling from the continuous population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(pk, (1-p)k)}.
+Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(pk, (1-p)k)}.
 }

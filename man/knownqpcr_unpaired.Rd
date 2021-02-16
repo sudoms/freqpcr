@@ -22,11 +22,11 @@ knownqpcr_unpaired(
 \arguments{
 \item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. In the RED-\eqn{\Delta\Delta}Cq method, it specify the test sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all elements must be marked 1, which trigger the exclusion of \code{baseChange} from the estimation process. NA is not allowed.}
 
-\item{Gene}{Numeric vector that specify the amplified gene is housekeeping (= 0) or target (= 1). NA is not allowed.}
+\item{Gene}{Numeric vector that specify each Cq measure (element of \code{Cq}) was taken with housekeeping (= 0) or target (= 1) locus. NA is not allowed.}
 
-\item{trueY}{A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be added to your experimental design.}
+\item{trueY}{A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.}
 
-\item{Cq}{Measured Cq values. NAs are allowed, and then the data vectors are trimmed internally.}
+\item{Cq}{Measured Cq values. NAs are allowed (but the vector length must be the same as \code{Digest}, \code{Gene}, and \code{trueY}), and then the data vector is trimmed internally.}
 
 \item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
 
@@ -40,13 +40,13 @@ knownqpcr_unpaired(
 
 \item{report}{The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.}
 
-\item{quiet}{Suppress the output of the function sent to stdout?.}
+\item{quiet}{Suppress the output of the function sent to stdout?}
 }
 \value{
 A table containing the estimated parameter values, which is same as \code{\link{knownqpcr}()}.
 }
 \description{
-A variant of \code{\link{knownqpcr}()} used when the qPCR analyses are only conducted for part of the sample sets (i.e., the combination of the four Cq measurements has missing values). To deal with the situation, the function accepts the observed Cq values concatenated into a single vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.
+A variant of \code{\link{knownqpcr}()} that accepts the Cq values concatenated into a vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.
 }
 \examples{
 # A dummy Cq dataset: four mixing ratios with four replicates.

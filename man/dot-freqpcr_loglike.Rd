@@ -34,5 +34,5 @@
 Scalar of the log likelihood.
 }
 \description{
-The internal function is called from the optimizer (\code{\link[stats]{nlm}()}) running in \code{\link{freqpcr}()}. It defines the log-likelihood by obtaining the two \eqn{\Delta}Cq values (differences in the four Cq measurements) provided that the allele mixing ratio for each bulk sample is given together with other parameters. This function was vectorized over multiple bulk samples.
+The internal function is called from the optimizer, \code{\link[stats]{nlm}()}, running in \code{\link{freqpcr}()}. It defines the log-likelihood by obtaining the two \eqn{\Delta}Cq values (differences in the four Cq measurements) provided that the allele mixing ratio for each bulk sample is given together with other parameters. This function is vectorized over multiple bulk samples.
 }

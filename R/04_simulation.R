@@ -2,17 +2,16 @@
 
 #' @title S4 class storing the dummy Cq data for performance test.
 #'
-#' @description A dummy Cq dataset suitable for testing the package. It is obtained as the output of \code{\link{make_dummy}()}.
-#' @slot N Sample sizes as a numeric vector. The \code{ntrap} argument of \code{\link{make_dummy}()} corresponds to the length of N. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample, which is usually inherited from the \code{npertrap} argument of \code{\link{make_dummy}()}.
-#' @slot m As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample.
-#' \cr As for diploidy, it is the matrix with 3 rows and \code{ntrap} columns, in which each column means the segregation ratio of the R and S individuals in each bulk sample. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the numbers of RS heterozygotes and SS homozygotes, respectively.
+#' @description A dummy Cq dataset suitable for a package test, typically obtained as the output of \code{\link{make_dummy}()}.
+#' @slot N Sample sizes as a numeric vector. The \code{ntrap} and  \code{npertrap} arguments of \code{\link{make_dummy}()} are inherited to the length of N and each \code{N[i]} element, the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample, respectively.
+#' @slot m Segregation ratio. As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total in the bulk sample. It has 3 rows and \code{ntrap} columns as for diploidy. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} stand for the numbers of RS heterozygotes and SS homozygotes, respectively.
 #' @slot xR,xS Numeric vector of the same length with N. \code{xR[i]} stores the amount of the template DNA for R allele contained in the \emph{i}th bulk sample.
 #' @slot housek0,target0,housek1,target1 Numeric vectors of the same lengths with N. Store the generated Cq values.
-#' @slot DCW \eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW}, is defined as (\code{target0 - housek0}).
-#' @slot DCD \eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD}, is defined as (\code{target1 - housek1}).
-#' @slot deldel \eqn{\Delta\Delta}Cq value, \code{deldel}, is defined as (\code{DCD - DCW}).
-#' @slot RFreqMeasure A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not included in the object to avoid leakage of information.
-#' @slot ObsP Defined as \code{min(RFreqMeasure, 1)} because \code{RFreqMeasure} can exceed 1 by definition.
+#' @slot DCW \eqn{\Delta}Cq values measured on the control samples (DNA extract without endonuclease digestion in the RED-\eqn{\Delta\Delta}Cq method, or pure R solution in a general \eqn{\Delta\Delta}Cq method), \code{DCW}, is defined as (\code{target0 - housek0}).
+#' @slot DCD \eqn{\Delta}Cq values measured on the test samples (samples after endonuclease digestion in the RED-\eqn{\Delta\Delta}Cq method, or samples with unknown allele mixing ratios in a general \eqn{\Delta\Delta}Cq method), \code{DCD}, is defined as (\code{target1 - housek1}).
+#' @slot deldel \eqn{\Delta\Delta}Cq value, defined as (\code{DCD - DCW}).
+#' @slot RFreqMeasure A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not recorded in the object to avoid leakage of information.
+#' @slot ObsP As \code{RFreqMeasure} can exceed 1 by definition, \code{ObsP} is defined as \code{min(RFreqMeasure, 1)}.
 #' @slot rand.seed The seed of the random-number generator (RNG) which was fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data.
 #' @export
 CqList <- setClass("CqList",
@@ -91,7 +90,7 @@ make_dummy <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
 
 #' @title Simulate freqpcr estimation based on user-generated dummy data.
 #'
-#' @description Wrapper of \code{\link{freqpcr}()} suitable for the performance test the using randomly-generated data object.
+#' @description Wrapper of \code{\link{freqpcr}()} suitable for the performance test using a randomly-generated data object.
 #' @param CqList Object belonging to the \linkS4class{CqList} class, typically the output from \code{\link{make_dummy}()}. Having the slots \code{N}, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all of which are numeric vectors of the same length.
 #' @param P,K,targetScale,sdMeasure If NULL (default), the parameter is considered unknown and estimated via \code{\link{freqpcr}()}. If a value is specified, it is passed to \code{\link{freqpcr}()} as a fixed parameter. On the contrary, \code{EPCR} and \code{zeroAmount} are always treated as fixed parameters, for which values must be supplied.
 #' @param beta,diploid,maxtime,print.level Configuration parameters which are passed directly to \code{\link{freqpcr}()}.

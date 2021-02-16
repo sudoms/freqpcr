@@ -6,29 +6,28 @@
 \alias{CqList}
 \title{S4 class storing the dummy Cq data for performance test.}
 \description{
-A dummy Cq dataset suitable for testing the package. It is obtained as the output of \code{\link{make_dummy}()}.
+A dummy Cq dataset suitable for a package test, typically obtained as the output of \code{\link{make_dummy}()}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{N}}{Sample sizes as a numeric vector. The \code{ntrap} argument of \code{\link{make_dummy}()} corresponds to the length of N. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample, which is usually inherited from the \code{npertrap} argument of \code{\link{make_dummy}()}.}
+\item{\code{N}}{Sample sizes as a numeric vector. The \code{ntrap} and  \code{npertrap} arguments of \code{\link{make_dummy}()} are inherited to the length of N and each \code{N[i]} element, the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample, respectively.}
 
-\item{\code{m}}{As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total number in the bulk sample.
-\cr As for diploidy, it is the matrix with 3 rows and \code{ntrap} columns, in which each column means the segregation ratio of the R and S individuals in each bulk sample. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} in diploidy stand for the numbers of RS heterozygotes and SS homozygotes, respectively.}
+\item{\code{m}}{Segregation ratio. As for haploidy, \code{m} is a matrix with 2 rows and \code{ntrap} columns. \code{m[1, i]} and \code{m[2, i]} stores the number of R (mutant) or S (wild type) individuals while \code{N[i] = sum(m[, i])} specifies the total in the bulk sample. It has 3 rows and \code{ntrap} columns as for diploidy. While \code{m[1, i]} stands for the number of RR hogozygote individuals, \code{m[2, i]} and \code{m[3, i]} stand for the numbers of RS heterozygotes and SS homozygotes, respectively.}
 
 \item{\code{xR,xS}}{Numeric vector of the same length with N. \code{xR[i]} stores the amount of the template DNA for R allele contained in the \emph{i}th bulk sample.}
 
 \item{\code{housek0,target0,housek1,target1}}{Numeric vectors of the same lengths with N. Store the generated Cq values.}
 
-\item{\code{DCW}}{\eqn{\Delta}Cq value measured on the bulk sample without endonuclease digestion, \code{DCW}, is defined as (\code{target0 - housek0}).}
+\item{\code{DCW}}{\eqn{\Delta}Cq values measured on the control samples (DNA extract without endonuclease digestion in the RED-\eqn{\Delta\Delta}Cq method, or pure R solution in a general \eqn{\Delta\Delta}Cq method), \code{DCW}, is defined as (\code{target0 - housek0}).}
 
-\item{\code{DCD}}{\eqn{\Delta}Cq value measured on the bulk sample after endonuclease digestion, \code{DCD}, is defined as (\code{target1 - housek1}).}
+\item{\code{DCD}}{\eqn{\Delta}Cq values measured on the test samples (samples after endonuclease digestion in the RED-\eqn{\Delta\Delta}Cq method, or samples with unknown allele mixing ratios in a general \eqn{\Delta\Delta}Cq method), \code{DCD}, is defined as (\code{target1 - housek1}).}
 
-\item{\code{deldel}}{\eqn{\Delta\Delta}Cq value, \code{deldel}, is defined as (\code{DCD - DCW}).}
+\item{\code{deldel}}{\eqn{\Delta\Delta}Cq value, defined as (\code{DCD - DCW}).}
 
-\item{\code{RFreqMeasure}}{A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not included in the object to avoid leakage of information.}
+\item{\code{RFreqMeasure}}{A classical index of the allele frequency calculated for each bulk sample, which is defined as \code{(1.0+EPCR)^(-deldel)}. Note that the values of \code{EPCR} and other parameters, such as \code{P} or \code{K}, are not recorded in the object to avoid leakage of information.}
 
-\item{\code{ObsP}}{Defined as \code{min(RFreqMeasure, 1)} because \code{RFreqMeasure} can exceed 1 by definition.}
+\item{\code{ObsP}}{As \code{RFreqMeasure} can exceed 1 by definition, \code{ObsP} is defined as \code{min(RFreqMeasure, 1)}.}
 
 \item{\code{rand.seed}}{The seed of the random-number generator (RNG) which was fed to the current R session to generate dummy \code{m}, \code{xR} and \code{xS} data.}
 }}

@@ -21,13 +21,13 @@ knownqpcr(
 )
 }
 \arguments{
-\item{housek0, target0, housek1, target1}{Measured Cq values. Numeric vectors having the same length as \code{A} and \code{trueY}. Any of the values should not be duplicated (any single Cq measure must not be recycled). If the Cq dataset has missing values, there are two ways. 1) Specify missing values explicitly as NA and use \code{\link{knownqpcr}()}, or 2) Use another function \code{\link{knownqpcr_unpaired}()}.
+\item{housek0, target0, housek1, target1}{Measured Cq values. Numeric vectors having the same length as \code{trueY} and \code{A} (if present). Any of the values should not be duplicated (any single Cq measure must not be recycled). If the Cq dataset has missing values, there are two ways. 1) Fill the missing values explicitly with NA and use \code{\link{knownqpcr}()}, or 2) Use another function \code{\link{knownqpcr_unpaired}()}, which can accept the Cq data in the `long' format.
 \cr
-In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} corresponds to the intact test samples (not digested with endonuclease) amplified with the primer sets for housekeeping- and target-loci, respectively. In general \eqn{\Delta\Delta}Cq analyses, no samples are marked as \code{housek0} or \code{target0} by the user (only \code{housek1} and \code{target1} should be input).}
+In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} corresponds to the intact test samples (not digested with endonuclease) amplified with the primer sets for housekeeping- and target-loci, respectively. In general \eqn{\Delta\Delta}Cq analyses, no samples are marked as \code{housek0} or \code{target0} by the user and only \code{housek1} and \code{target1} should be input. It triggers the exclusion of \code{baseChange} from the estimation process.}
 
-\item{trueY}{A numeric vector having the same length as the Cq data vectors. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1. To improve the estimation accuracy, y == 1 (pure mutant solution) should be added to your experimental design.}
+\item{trueY}{A numeric vector having the same length as the Cq data vectors. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.}
 
-\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data vectors. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
+\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data vectors. It is the counterpart of the \code{N} or \code{A} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
 
 \item{XInit}{A named vector specifying the initial sizes of the auxiliary parameters in the optimization. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.}
 
@@ -39,26 +39,26 @@ In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} correspond
 
 \item{report}{The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.}
 
-\item{quiet}{Suppress the output of the function sent to stdout?.}
+\item{quiet}{Suppress the output of the function sent to stdout?}
 }
 \value{
 A table containing the estimated values for the following parameters:
 \enumerate{
     \item\code{meanDNA} is the template DNA concentration (of housekeeping gene, per unit volume of sample solution) compared to the threshold line of PCR.
     \item\code{targetScale} (\eqn{\delta_{T}}) is the relative template DNA amount of the target to the houskeeping loci.
-    \item\code{baseChange} (\eqn{\delta_{B}}) is the change rate in the DNA amount after endonuclease digestion (in RED-\eqn{\Delta\Delta}Cq method). In general \eqn{\Delta\Delta}Cq analyses (neither \code{housek0} nor \code{target0} is input), this parameter is not returned. In both cases, \code{baseChange} is not used in \code{\link{freqpcr}()}.
+    \item\code{baseChange} (\eqn{\delta_{B}}) is the change rate in the DNA amount after endonuclease digestion (in RED-\eqn{\Delta\Delta}Cq method). In general \eqn{\Delta\Delta}Cq analyses (neither \code{housek0} nor \code{target0} is input), this parameter is not returned. In both cases, \code{baseChange} is not required to run \code{\link{freqpcr}()}.
     \item\code{sdMeasure} (\eqn{\sigma_{c}}) is the measurement error (standard deviation) at each Cq value.
     \item\code{EPCR} (\eqn{\eta}) is the amplification efficiency per PCR cycle.
 }
 }
 \description{
-The function to estimate the auxiliary experimental parameters using DNA solutions, provided the dataset contains samples with multiple allele mixing ratios and the exact mixing ratio are known for each sample. This function is used when all replicates in the  dataset comprise the complete observations on the \eqn{2 \times 2} combinations of the qPCR conditions in a RED-\eqn{\Delta\Delta}Cq analysis: (loci for target-gene or housekeeping-gene) and (the target gene is undigested or digested with endonuclease).
+The function to estimate the auxiliary experimental parameters using DNA solutions, provided the dataset contains samples with multiple allele mixing ratios and the exact mixing ratio are known for each sample. This function is used when all replicates in the  dataset comprise the complete observations on the \eqn{2 \times 2} combinations of the qPCR conditions in a RED-\eqn{\Delta\Delta}Cq analysis: (loci for target or housekeeping genes) and (the target gene is undigested or digested with endonuclease). The quartet of the four Cq data, \code{housek0}, \code{target0} (these two are undigested samples amplified with housekeeping and target genes, respectively), \code{housek1}, and \code{target1} (digested samples) should be prepared as four numeric vectors having the same length.
 \cr
-The quartet of the four Cq data, \code{housek0}, \code{target0} (these two are undigested), \code{housek1}, and \code{target1} (they are digested) should be prepared as four numeric vectors having the same length. If the \eqn{2 \times 2} combination is not complete, use another function, \code{\link{knownqpcr_unpaired}()}, where you can deal with situations, for example, only a part of the undigested sample was quantified.
+One more variable, \code{trueY} is needed to run the estimation process; it a numeric vector having the same length with the four Cq data. It holds the exact allele-mixing ratio for each quartet (also see the code example). Optionally, you can adjust the relative DNA concentration between the replicates with a parameter vector \code{A}.
 \cr
-One more variable, \code{trueY} is needed to run the estimation process; it a numeric vector having the same length with the four Cq data. It holds the exact allele-mixing ratio for each quartet (also see the code example). Optionally, you can fix the relative DNA concentration between the replicates with a parameter vector \code{A}.
+The \code{\link{knownqpcr}()} function can also deal with general \eqn{\Delta\Delta}Cq analyses. In such cases, samples with any mixing ratios should be marked as `digested samples' i.e., either of  \code{housek1} or \code{target1}, depending on the loci to be amplified. The arguments of the corresponding undigested samples, \code{housek0} and \code{target0}, are not specified. Then, the parameter \code{baseChange} (\eqn{\delta_{B}}: the change rate of DNA contents before/after the endonuclease digestion) is not included in the estimation result.
 \cr
-The \code{\link{knownqpcr}()} function can also deal with general \eqn{\Delta\Delta}Cq analyses. In such cases, samples with any mixing ratios should be marked as `digested samples' i.e., either of  \code{housek1} or \code{target1}, depending on the loci to be amplified. The arguments of the corresponding undigested samples, \code{housek0} and \code{target0}, are not required. The parameter \code{baseChange} (the change rate of DNA contents before/after the endonuclease digestion) is then not included in the estimation result. You can also use \code{\link{knownqpcr_unpaired}()} to analyze general \eqn{\Delta\Delta}Cq data.
+You can also use another function, \code{\link{knownqpcr_unpaired}()}, to analyze RED-\eqn{\Delta\Delta}Cq or general \eqn{\Delta\Delta}Cq data.
 }
 \examples{
 # A dummy Cq dataset: four mixing ratios with four replicates.
@@ -78,7 +78,7 @@ print(d.cmp)
 
 knownqpcr(  housek0=d.cmp$housek0, target0=d.cmp$target0,
             housek1=d.cmp$housek1, target1=d.cmp$target1,
-            trueY=d.cmp$trueY, A=d.cmp$A   )
+            trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE  )
 
 # In general DeltaDeltaCq analyses, the experimental design will not include
 # dedicated control samples. The function then runs without 'housek0' and 'target0'.

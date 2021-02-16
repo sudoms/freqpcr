@@ -1,7 +1,7 @@
 Type: Package
 Package: freqpcr
 Title: Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples
-Version: 0.3.2
+Version: 0.3.4
 Authors@R: c(
     person(given="Masaaki", family="Sudo", email="masaaki@sudori.info", role=c("aut", "cre"), comment=c(ORCID="0000-0001-9834-9857"))
     )
