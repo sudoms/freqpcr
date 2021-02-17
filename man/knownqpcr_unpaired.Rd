@@ -20,7 +20,7 @@ knownqpcr_unpaired(
 )
 }
 \arguments{
-\item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. In the RED-\eqn{\Delta\Delta}Cq method, it specify the test sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all elements must be marked 1, which trigger the exclusion of \code{baseChange} from the estimation process. NA is not allowed.}
+\item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. NA is not allowed. In the RED-\eqn{\Delta\Delta}Cq method, it specify the sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all samples must be marked \code{Digest = 1} (a test sample). Although the samples of \code{trueY[i] == 1} potentially fall into the control, they also must be marked 1 because the absence of the dedicated control samples triggers dropping \code{baseChange} from the estimation.}
 
 \item{Gene}{Numeric vector that specify each Cq measure (element of \code{Cq}) was taken with housekeeping (= 0) or target (= 1) locus. NA is not allowed.}
 
@@ -28,9 +28,9 @@ knownqpcr_unpaired(
 
 \item{Cq}{Measured Cq values. NAs are allowed (but the vector length must be the same as \code{Digest}, \code{Gene}, and \code{trueY}), and then the data vector is trimmed internally.}
 
-\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, but an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
+\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. If present, \code{A} must not include missing values. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), \code{A} should be used exclusively to reflect the relative contents between the sample solutions. Otherwise, you should keep its default setting (1 for all replicates).}
 
-\item{XInit}{A named vector specifying the initial sizes of the auxiliary parameters in the optimization. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.}
+\item{XInit}{A named vector specifying the initial parameter values to be optimized. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.}
 
 \item{method}{A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.}
 

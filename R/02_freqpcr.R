@@ -25,9 +25,9 @@ CqFreq <- setClass("CqFreq",
 #' Since version 0.3.2, user can also use an experimental `continuous model' by specifying \code{A} instead of \code{N}. That is, each sample DNA is directly extracted from the environment and the sample allele ratio \code{y} follows \code{y ~ Beta(apk, a(1-p)k)} instead of \code{y ~ Beta(mk, (n-m)k), m ~ Binomial(n, p)}, where \code{p} and \code{k} are the population allele frequency and the gamma shape parameter of the individual DNA yield, respectively. Each element of \code{A}, \code{a} is a scaling factor of relative DNA contents between the samples. The continuous model is likely when each sample directly comes from the environment e.g., water sampling in eDNA analyses or cultures of microorganism or cells in petri dishes.
 #' @param N Sample sizes as a numeric vector. \code{N[i]} signifies the number of individuals (both for haploidy and diploidy) contained in the \emph{i}th bulk sample. \code{N} must not contain a missing value (\code{NA}). If \code{N} is not applicable (= even not 1), feed \code{A} instead of \code{N} and then the estimation process runs with the `continuous model'.
 #' @param A Use instead of \code{N} in the continuous model. It is a scale factor to control the relative DNA content between samples. \code{A} must not contain a missing value (\code{NA}). \code{A[i]} can take any positive value. Considering the case you have arranged each sample by e.g. water filrtation or extraction from a culture in a petri dish, it is convenient to define the unit size of \code{A[i]} == 1.0 to be same as the vessel volume (e.g. 2.0 for two petri dishs, 0.5 for half bottle of water, etc.). When neither \code{N} nor \code{A} is specified by the user, the function stops. If both \code{N} and \code{A} are specified, only \code{N} is evaluated.
-#' @param housek0 A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} is the Cq values of the test sample without the restriction enzyme digestion, which is amplified with the primer set for a housekeeping gene. In a general \eqn{\Delta\Delta}Cq analyses, \code{housek0} is defined for the control sample (typically, 100\% mutant) solution, which is also amplified with the primer set for the housekeeping gene.
+#' @param housek0 A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} is the Cq values of the test sample without the restriction enzyme digestion, which is amplified with the primer set for a housekeeping gene. In general \eqn{\Delta\Delta}Cq analyses, \code{housek0} is defined for the control sample (typically, 100\% mutant) solution, which is also amplified with the primer set for the housekeeping gene.
 #' \cr
-#' The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all must have the same data length. If either \code{N} or \code{A} argument is present, it also must be the same length as the four Cq vectors. If the Cq dataset has missing values, they must be filled with NA so that the length of the data does not differ between the arguments.
+#' The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all must have the same data length. They also must be the same length as \code{N} or \code{A}. If the Cq dataset has missing values, they must be filled with NA so that the length of the data vectors does not differ.
 #' @param target0 A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{target0[i]} signifies the measured Cq value of the \emph{i}th bulk sample without the digestion, which is treated with the primer set that amplifies both alleles, wild-type (or S: susceptible) and mutant (or R: resistant to a pesticide), on the target locus. In general \eqn{\Delta\Delta}Cq analyses, \code{target0} is the Cq values of the pure-mutant control sample, which is amplified with a mutant-allele-specific primer set.
 #' @param housek1 A numeric vector. The Cq values of the test sample measured on the housekeeping gene after the restriction enzyme digestion (in RED-\eqn{\Delta\Delta}Cq method), or the test sample amplified on the housekeeping gene (in general \eqn{\Delta\Delta}Cq analyses).
 #' @param target1 A numeric vector. For each test sample with unknown allele-ratio, \code{target1[i]} is defined as the Cq value for the target locus amplified after the restriction enzyme digestion (in RED-\eqn{\Delta\Delta}Cq method), or the target locus amplified with the R-allele-specific primer set (in general \eqn{\Delta\Delta}Cq analyses).
@@ -78,7 +78,7 @@ CqFreq <- setClass("CqFreq",
 #'                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
 #'                    K=2,
 #'                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=1 )
-#' # Estimation with freqpcr when the model is continuous.
+#' # Estimation with freqpcr if the model was regarded continuous.
 #' result <- freqpcr( A=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
 #'                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
 #'                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=2 )
@@ -92,10 +92,11 @@ freqpcr <- function(N=NULL, A=NULL, housek0, target0, housek1, target1,
 
     arg.len <- all(length(housek0), length(target0), length(housek1), length(target1))
     if (!arg.len) {
-        stop(paste("Error: the arguments housek0, target0, housek1, and target1 must have the same length."))
+        stop(paste( "housek0, target0, housek1, and target1 must have the same length.",
+                    "Missing values must be filled with NA.", sep=" "))
     }
     if (is.null(EPCR) & length(target1)<3) {
-        stop(paste("Error: when EPCR is unknown, please supply Cq set at least of length>=3"))
+        stop(paste("When EPCR is unknown, please supply Cq set at least of length>=3"))
     }
 
     model.continuous <- FALSE
@@ -131,7 +132,8 @@ freqpcr <- function(N=NULL, A=NULL, housek0, target0, housek1, target1,
         warning(paste("Warning: you should specify 'EPCR' as a fixed parameter"))
     }
 
-    # N and A cannot accept a missing value. Cq data can. NA are then trimmed inside the likelihood function.
+    # It may be the case that control sample Cq mesures are only available for a part of the replicates.
+    # Thus, Cq data can accept a missing value while cannot N and A. NA are then trimmed inside the likelihood function.
     DCW <- target0-housek0
     DCD <- target1-housek1
     deldel <- DCD-DCW
@@ -371,7 +373,7 @@ freqpcr <- function(N=NULL, A=NULL, housek0, target0, housek1, target1,
 
 #' @title Log-likelihood when sample allele ratio is continuous.
 #'
-#' @description Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(pk, (1-p)k)}.
+#' @description Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(apk, a(1-p)k)}, where \code{a} and \code{k} are the relative DNA content of the sample and the gamma shape parameter, respectively.
 #' @param X Numeric vector that stores the parameter values to be optimized via \code{\link{nlm}()}: \code{P} in logit scale and \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR} in log scale.
 #' @param A Relative DNA content between the samples. A continuous version of \code{N} in \code{\link{.freqpcr_loglike}()}, as a numeric vector.
 #' @param DCW,DCD Numeric vectors. They store the measured values of the two \eqn{\Delta}Cq: \code{DCW (= target0 - housek0)} and \code{DCD (= target1 - housek1)}.

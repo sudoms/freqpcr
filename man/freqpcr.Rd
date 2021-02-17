@@ -34,9 +34,9 @@ freqpcr(
 
 \item{A}{Use instead of \code{N} in the continuous model. It is a scale factor to control the relative DNA content between samples. \code{A} must not contain a missing value (\code{NA}). \code{A[i]} can take any positive value. Considering the case you have arranged each sample by e.g. water filrtation or extraction from a culture in a petri dish, it is convenient to define the unit size of \code{A[i]} == 1.0 to be same as the vessel volume (e.g. 2.0 for two petri dishs, 0.5 for half bottle of water, etc.). When neither \code{N} nor \code{A} is specified by the user, the function stops. If both \code{N} and \code{A} are specified, only \code{N} is evaluated.}
 
-\item{housek0}{A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} is the Cq values of the test sample without the restriction enzyme digestion, which is amplified with the primer set for a housekeeping gene. In a general \eqn{\Delta\Delta}Cq analyses, \code{housek0} is defined for the control sample (typically, 100\% mutant) solution, which is also amplified with the primer set for the housekeeping gene.
+\item{housek0}{A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} is the Cq values of the test sample without the restriction enzyme digestion, which is amplified with the primer set for a housekeeping gene. In general \eqn{\Delta\Delta}Cq analyses, \code{housek0} is defined for the control sample (typically, 100\% mutant) solution, which is also amplified with the primer set for the housekeeping gene.
 \cr
-The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all must have the same data length. If either \code{N} or \code{A} argument is present, it also must be the same length as the four Cq vectors. If the Cq dataset has missing values, they must be filled with NA so that the length of the data does not differ between the arguments.}
+The following four Cq arguments, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all must have the same data length. They also must be the same length as \code{N} or \code{A}. If the Cq dataset has missing values, they must be filled with NA so that the length of the data vectors does not differ.}
 
 \item{target0}{A numeric vector. In RED-\eqn{\Delta\Delta}Cq method, \code{target0[i]} signifies the measured Cq value of the \emph{i}th bulk sample without the digestion, which is treated with the primer set that amplifies both alleles, wild-type (or S: susceptible) and mutant (or R: resistant to a pesticide), on the target locus. In general \eqn{\Delta\Delta}Cq analyses, \code{target0} is the Cq values of the pure-mutant control sample, which is amplified with a mutant-allele-specific primer set.}
 
@@ -115,7 +115,7 @@ result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
                    K=2,
                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=1 )
-# Estimation with freqpcr when the model is continuous.
+# Estimation with freqpcr if the model was regarded continuous.
 result <- freqpcr( A=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=2 )

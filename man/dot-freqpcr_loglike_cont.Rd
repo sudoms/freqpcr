@@ -31,5 +31,5 @@
 Scalar of the log likelihood.
 }
 \description{
-Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(pk, (1-p)k)}.
+Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(apk, a(1-p)k)}, where \code{a} and \code{k} are the relative DNA content of the sample and the gamma shape parameter, respectively.
 }

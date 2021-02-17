@@ -9,9 +9,9 @@
 \arguments{
 \item{X}{A numeric vector that stores the current parameter sizes of \code{meanDNA}, \code{targetScale}, \code{baseChange}, \code{sdMeasure}, \code{zeroAmount}, and \code{EPCR} in log scale.}
 
-\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data vectors. It is the counterpart of the \code{N} or \code{A} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), this variable should be used exclusively to reflect the relative DNA contents between the samples solutions. Otherwise, it is better to keep its default setting (1 for all replicates).}
+\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as the Cq data. If present, \code{A} must not include missing values. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), \code{A} should be used exclusively to reflect the relative contents between the sample solutions. Otherwise, you should keep its default setting (1 for all replicates).}
 
-\item{trueY}{A numeric vector having the same length as the Cq data vectors. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.}
+\item{trueY}{A numeric vector having the same length as the Cq data. \code{trueY[i]} signifies the exact allele frequency in the \emph{i}th sample. The values must be between 0 and 1, and \code{NA} is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.}
 }
 \value{
 A scalar of the log likelihood.
