@@ -38,9 +38,9 @@ make_dummy(
 
 \item{zeroAmount}{A numeric between 0 and 1, usually near 0, giving the residue rate of restriction enzyme digestion in RED-\eqn{\Delta\Delta}Cq method.}
 
-\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
+\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error (standard deviation) on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
 
-\item{diploid}{The target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote individual, which is unlikely in many animals but necessary for the calculation in a realistic time.}
+\item{diploid}{Is the target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation of diploidy assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote individual, which is unlikely in many animals but necessary for the calculation in a realistic time.}
 }
 \value{
 Object of the S4 class \linkS4class{CqList}, storing the dummy experiment data of Cq-based qPCR analysis. Note that a \linkS4class{CqList} object in no way contains original information on \code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}.

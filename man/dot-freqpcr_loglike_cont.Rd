@@ -11,7 +11,8 @@
   DCD,
   zeroAmount,
   para.fixed = NULL,
-  beta = TRUE
+  beta = TRUE,
+  dummyDCW = FALSE
 )
 }
 \arguments{
@@ -26,10 +27,12 @@
 \item{para.fixed}{Named numeric vector that stores the fixed parameters inherited from \code{\link{freqpcr}()}, if specified. By default (\code{NULL}), all the parameters (\code{P}, \code{K}, \code{targetScale}, \code{sdMeasure}, and \code{EPCR}) are unknown. Unlike \code{X}, each element value is set in linear scale.}
 
 \item{beta}{Whether to use the beta distribution to approximate the sample allele ratio instead of specifying individual gamma distribution for each of the allelic DNA amounts? Default is \code{TRUE}, which accelerates the calculation.}
+
+\item{dummyDCW}{Whether the \eqn{\Delta}Cq values of the control samples are dummy or not.}
 }
 \value{
 Scalar of the log likelihood.
 }
 \description{
-Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consists of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(apk, a(1-p)k)}, where \code{a} and \code{k} are the relative DNA content of the sample and the gamma shape parameter, respectively.
+Called from \code{\link{freqpcr}()} instead of \code{\link{.freqpcr_loglike}()} when the model is `continuous'. This function assumes that each sample does not consist of \code{n} individual organisms with certain genotypes, but the result of a direct DNA extraction from the sub-population having the allele ratio around \code{p:(1-p)}. Each sample allele ratio is considered to follow \code{Beta(apk, a(1-p)k)}, where \code{a} and \code{k} are the relative DNA content of the sample and the gamma shape parameter, respectively.
 }

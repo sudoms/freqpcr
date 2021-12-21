@@ -2,3 +2,4 @@
 ^README\.jp\.html$
 ^README\.jp\.pdf$
 ^cran-comments\.md$
+^CRAN-RELEASE$

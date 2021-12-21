@@ -22,7 +22,7 @@
 \arguments{
 \item{del}{Numeric vector of the observed \eqn{\Delta}Cq values.}
 
-\item{SHR}{The gamma shape parameters for the mutant (R) portion of the bulk samples. Should be the same length as del. Each element of SHR is defined as K*(the assumed number of R allele in the bulk sample).}
+\item{SHR}{The gamma shape parameters for the mutant (R) portion of the bulk samples. Should be the same vector length as del. Each element of SHR is defined as K*(the assumed number of R allele in the bulk sample: 1, 2, 3, ..., n-1).}
 
 \item{SHS}{The gamma shape parameters for the wild (S) portion of the bulk samples. Should be the same length as del. Each element of SHS is defined as K*(the assumed number of S allele in the bulk sample).}
 
@@ -30,9 +30,9 @@
 
 \item{targetScale}{(\eqn{\delta_{T}}) Scalar. The relative template DNA amount of the target locus to the houskeeping locus. If known, given as a positive numeric.}
 
-\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
+\item{sdMeasure}{(\eqn{\sigma_{c}}) Scalar. The measurement error (standard deviation) on each Cq value following Normal(0, \eqn{\sigma_{c}^2}). If known, given as a positive numeric.}
 
-\item{xsm}{Specify the accumulation of the standard deviation of the Cq measuring errors when the *-Cq values are fed as difference. For \eqn{\Delta}Cq values, sdMeasure times two. For \eqn{\Delta\Delta}Cq, sdMeasure times four. Default is used in most cases.}
+\item{xsm}{Specify the accumulation of the standard deviation of the Cq measuring errors when the *-Cq values are fed as difference. For \eqn{\Delta}Cq values, sdMeasure times two. For \eqn{\Delta\Delta}Cq, sdMeasure times four. Default is two and used in most cases.}
 
 \item{EPCR}{(\eqn{\eta}) Scalar. Amplification efficiency per PCR cycle. If known, given as a positive numeric. When \code{EPCR = 1}, template DNA doubles every cycle (\code{EPCR + 1 = 2}).}
 

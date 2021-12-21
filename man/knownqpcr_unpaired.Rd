@@ -20,21 +20,21 @@ knownqpcr_unpaired(
 )
 }
 \arguments{
-\item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. NA is not allowed. In the RED-\eqn{\Delta\Delta}Cq method, it specify the sample is intact (= 0) or digested with endonuclease (= 1). In general \eqn{\Delta\Delta}Cq analyses, all samples must be marked \code{Digest = 1} (a test sample). Although the samples of \code{trueY[i] == 1} potentially fall into the control, they also must be marked 1 because the absence of the dedicated control samples triggers dropping \code{baseChange} from the estimation.}
+\item{Digest}{Numeric vector having the same length as \code{Gene}, \code{trueY}, and \code{Cq}. \code{NA} is not allowed. In the RED-\eqn{\Delta\Delta}Cq method, it specify the sample is intact (= 0) or digested with endonuclease (= 1). In other \eqn{\Delta\Delta}Cq-based analyses, there will be no control sample and all observations must be marked \code{Digest = 1}.}
 
-\item{Gene}{Numeric vector that specify each Cq measure (element of \code{Cq}) was taken with housekeeping (= 0) or target (= 1) locus. NA is not allowed.}
+\item{Gene}{Numeric vector that specify each Cq measure (element of \code{Cq}) was taken with housekeeping (= 0) or target (= 1) locus. \code{NA} is not allowed.}
 
-\item{trueY}{A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and NA is not allowed. To improve the estimation accuracy, y == 1 (pure mutant solution) should be included in your experimental design.}
+\item{trueY}{A numeric vector. \code{trueY[i]} signifies the exact frequency of the mutant allele in the \emph{i}th sample. The values must be between 0 and 1, and \code{NA} is not allowed. To improve the estimation accuracy, it is better to include the settings y == 0 (pure S solution) and y == 1 (pure R) in your dataset.}
 
-\item{Cq}{Measured Cq values. NAs are allowed (but the vector length must be the same as \code{Digest}, \code{Gene}, and \code{trueY}), and then the data vector is trimmed internally.}
+\item{Cq}{Measured Cq values. This argument is a numeric vector and can contain \code{NA}s. The vector length must be the same as \code{Digest}, \code{Gene}, and \code{trueY} (i.e., missing values must be filled with \code{NA}).}
 
-\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Digest}, \code{Gene}, \code{trueY}, and \code{Cq}. If present, \code{A} must not include missing values. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), \code{A} should be used exclusively to reflect the relative contents between the sample solutions. Otherwise, you should keep its default setting (1 for all replicates).}
+\item{A}{Optionally, you can specify relative DNA content between the samples, as a numeric vector having the same length as \code{Cq}. If present, \code{A} must not include missing values. It is the counterpart of the \code{N} argument in \code{\link{freqpcr}()}, whereas an element of \code{A} is not restricted to integer. Because the concentration as a whole is also adjusted with the parameter \code{meanDNA} (see Value section), \code{A} is used exclusively to reflect the relative contents between the sample solutions. Otherwise, \code{A} should be left unspecified (the default is 1 for all replicates).}
 
-\item{XInit}{A named vector specifying the initial parameter values to be optimized. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate of \code{exp(-5)} = 0.007. It is highly recommended to keep the default values.}
+\item{XInit}{Optionally, the named vector specifies the initial parameter values to be optimized. Defined in the natural log scale; e.g. \code{zeroAmount = -5} corresponds to the residue rate \code{exp(-5)} = 0.007. Keeping the default is highly recommended.}
 
 \item{method}{A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.}
 
-\item{pvalue}{The two-sided confidence interval is calculated at the last iteration based on the significance level. Default is 0.05, which returns the 95\% CI (2.5 to 97.5 percentile) based on the Hessian matrix.}
+\item{pvalue}{The two-sided confidence interval is calculated at the last iteration at given significance level. Default is 0.05, which returns the 95\% Wald's CI (2.5 to 97.5 percentile) based on the Hessian matrix.}
 
 \item{trace}{Non-negative integer. If positive, \code{\link[stats]{optim}()} outputs trace information. The default is 0 (no information).}
 
@@ -43,7 +43,7 @@ knownqpcr_unpaired(
 \item{quiet}{Suppress the output of the function sent to stdout?}
 }
 \value{
-A table containing the estimated parameter values, which is same as \code{\link{knownqpcr}()}.
+A table containing the estimated parameter values. The format is same as \code{\link{knownqpcr}()}.
 }
 \description{
 A variant of \code{\link{knownqpcr}()} that accepts the Cq values concatenated into a vector (the argument \code{Cq}) accompanied with the experimental conditions (the arguments \code{Digest} and \code{Gene}). Their exact allele mixing ratios are known as \code{trueY}.

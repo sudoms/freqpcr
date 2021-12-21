@@ -4,9 +4,9 @@
 
 #' @description Internal function to integrate the likelihood getting the \eqn{\Delta}Cq value (the argument \code{del}) over the entire range of the allele ratio (0 to 1). Vectorized for multiple bulk samples. Having the same arguments with .integrate_gamma.
 #' @param del Numeric vector of the observed \eqn{\Delta}Cq values.
-#' @param SHR The gamma shape parameters for the mutant (R) portion of the bulk samples. Should be the same length as del. Each element of SHR is defined as K*(the assumed number of R allele in the bulk sample).
+#' @param SHR The gamma shape parameters for the mutant (R) portion of the bulk samples. Should be the same vector length as del. Each element of SHR is defined as K*(the assumed number of R allele in the bulk sample: 1, 2, 3, ..., n-1).
 #' @param SHS The gamma shape parameters for the wild (S) portion of the bulk samples. Should be the same length as del. Each element of SHS is defined as K*(the assumed number of S allele in the bulk sample).
-#' @param xsm Specify the accumulation of the standard deviation of the Cq measuring errors when the *-Cq values are fed as difference. For \eqn{\Delta}Cq values, sdMeasure times two. For \eqn{\Delta\Delta}Cq, sdMeasure times four. Default is used in most cases.
+#' @param xsm Specify the accumulation of the standard deviation of the Cq measuring errors when the *-Cq values are fed as difference. For \eqn{\Delta}Cq values, sdMeasure times two. For \eqn{\Delta\Delta}Cq, sdMeasure times four. Default is two and used in most cases.
 #' @param cubmethod Cubature method passed to the integrator function. See the section "Methods for cubintegrate".
 #' @param relTol The maximum tolerance passed to the cubature method. Though the default of cubature::cubintegrate function is 1e-5, the accuracy is reduced here to acceralate the integration.
 #' @param absTol The absolute tolerance passed to the cubature method. The default is 1e-8, which is less accurate than the default of cubintegrate function (1e-12) but considered enough for the estimation.
@@ -28,9 +28,10 @@
                                 cubmethod="hcubature", relTol=1e-1, absTol=1e-8, maxEval=10^6) {
     fa <- function(x, SHR, SHS, del, zeroAmount, targetScale, sdMeasure, xsm, EPCR) {
         dbeta(x, shape1=SHR, shape2=SHS) *
-        dnorm(del, mean=-(log(targetScale)+log((zeroAmount+(1-zeroAmount)*x)))/log(1.0+EPCR), sd=sqrt(xsm)*sdMeasure)
+        dnorm(  del, 
+                mean=-(log(targetScale)+log((zeroAmount+(1-zeroAmount)*x)))/log(1.0+EPCR), 
+                sd=sqrt(xsm)*sdMeasure  )
     }
-#    return( cubature::cubintegrate(  f=fa, lower=0, upper=1, fDim=length(del),
     return( cubintegrate(  f=fa, lower=0, upper=1, fDim=length(del),
                         method=cubmethod, relTol=relTol, absTol=absTol, maxEval=maxEval, nVec=1L,
                         SHR=SHR, SHS=SHS, del=del, zeroAmount=zeroAmount, targetScale=targetScale,
@@ -62,7 +63,6 @@
             (x[1]/((1-x[1])^3))
         ) # when m=0 or m=n, SHR or SHS are always 0 and dgamma returns 0.
     }
-#    return( cubature::cubintegrate( f=fa, lower=c(0, 0), upper=c(1, pi/2), fDim=length(del),
     return( cubintegrate( f=fa, lower=c(0, 0), upper=c(1, pi/2), fDim=length(del),
                         method=cubmethod, relTol=relTol, absTol=absTol, maxEval=maxEval, nVec=1L,
                         SHR=SHR, SHS=SHS, del=del, zeroAmount=zeroAmount, targetScale=targetScale,

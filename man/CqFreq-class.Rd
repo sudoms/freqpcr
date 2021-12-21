@@ -4,9 +4,9 @@
 \name{CqFreq-class}
 \alias{CqFreq-class}
 \alias{CqFreq}
-\title{S4 class that stores the estimation result of \code{\link{freqpcr}()}.}
+\title{Output object of \code{\link{freqpcr}()}.}
 \description{
-S4 class that stores the estimation result of \code{\link{freqpcr}()}.
+Output object of \code{\link{freqpcr}()}.
 }
 \section{Slots}{
 

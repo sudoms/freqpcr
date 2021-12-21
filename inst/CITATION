@@ -1,19 +1,22 @@
 citHeader("To cite freqpcr in publications use:")
 
 citEntry(entry="Article",
-    title = "freqpcr: interval estimation of population allele frequency based on \u0394\u0394Cq measures of quantitative PCR over bulk samples",
+    title = "freqpcr: Estimation of Population Allele Frequency Using qPCR \u0394\u0394Cq Measures From Bulk Samples",
     author = personList(
         as.person("Masaaki Sudo"),
         as.person("Masahiro Osakabe")),
-    journal = "bioRxiv",
+    journal = "Molecular Ecology Resources",
     year = "2021",
-    doi = "10.1101/2021.01.19.427228",
-    publisher = "Cold Spring Harbor Laboratory",
-    abstract = "PCR techniques, both quantitative (qPCR) and non-quantitative, have been used to estimate allele frequency in a population. However, the labor required to sample more individuals and handle each sample makes it difficult to quantify rare mutations, such as pesticide-resistance genes at the early stages of resistance development. Pooling DNA from multiple individuals as a {\textquotedblleft}bulk sample{\textquotedblright} may reduce handling costs. The output of qPCR on a bulk sample, however, contains uncertainty owing to variations in DNA yields from each individual, in addition to measurement error. In this study, we developed a statistical model for the interval estimation of allele frequency via ΔΔCq-based qPCR analyses of multiple bulk samples taken from a population. We assumed a gamma distribution as the individual DNA yield and developed an R package for parameter estimation, which was verified with real DNA samples from acaricide-resistant spider mites, as well as a numerical simulation. Our model resulted in unbiased point estimates of the allele frequency compared with simple averaging of the ΔΔCq values, and their confidence intervals suggested collecting more samples from individuals and pooling them may produce higher precision than individual PCR tests with moderate sample sizes.",
-    URL = "https://www.biorxiv.org/content/early/2021/01/20/2021.01.19.427228",
-    eprint = "https://www.biorxiv.org/content/early/2021/01/20/2021.01.19.427228.full.pdf",
+    volume = "n/a",
+    number = "n/a",
+    pages = "0--14",
+    keywords = "confidence interval, group testing, maximum-likelihood estimation, R language, real-time polymerase chain reaction",
+    doi = "10.1111/1755-0998.13554",
+    url = "https://onlinelibrary.wiley.com/doi/abs/10.1111/1755-0998.13554",
+    eprint = "https://onlinelibrary.wiley.com/doi/pdf/10.1111/1755-0998.13554",
+    abstract = "PCR techniques, both quantitative (qPCR) and nonquantitative, have been used to estimate the frequency of a specific allele in a population. However, the labour required to sample numerous individuals and subsequently handle each sample renders the quantification of rare mutations (e.g., pesticide resistance gene mutations at the early stages of resistance development) challenging. Meanwhile, pooling DNA from multiple individuals as a “bulk sample” combined with qPCR may reduce handling costs. The qPCR output for a bulk sample, however, contains uncertainty owing to variations in DNA yields from each individual, in addition to measurement errors. In this study, we have developed a statistical model to estimate the frequency of the specific allele and its confidence interval when the sample allele frequencies are obtained in the form of \u0394\u0394Cq in the qPCR analyses on multiple bulk samples collected from a population. We assumed a gamma distribution as the individual DNA yield and developed an R package for parameter estimation, which was verified using real DNA samples from acaricide-resistant spider mites, as well as a numerical simulation. Our model resulted in unbiased point estimates of the allele frequency compared with simple averaging of the \u0394\u0394Cq values. The confidence intervals suggest that dividing the bulk samples into more parts will improve precision if the total number of individuals is equal; however, if the cost of PCR analysis is higher than that of sampling, increasing the total number and pooling them into a few bulk samples may also yield comparable precision.",
     textVersion =
         paste(  "Masaaki Sudo, Masahiro Osakabe (2021).",
-                "freqpcr: interval estimation of population allele frequency based on \u0394\u0394Cq measures of quantitative PCR over bulk samples.",
-                "BioRxiv, xx."  )
+                "freqpcr: Estimation of population allele frequency using qPCR ΔΔCq measures from bulk samples.",
+                "Molecular Ecology Resources."  )
 )

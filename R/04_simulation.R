@@ -152,9 +152,9 @@ sim_dummy <- function(  CqList, EPCR, zeroAmount,
         result <- matrix(numeric(5*6), byrow=FALSE, ncol=6) # nrow == length(param0.full)
         rownames(result) <- c(  "P (R-allele frequency)",
                                 "K (gamma shape parameter)",
-                                "targetScale (relative amount of target locus)",
-                                "Cq measurement error (SD)",
-                                "EPCR (Duplication efficiency of PCR)")
+                                "targetScale (rel. DNA quantity)",
+                                "sdMeasure (Cq measurement error)",
+                                "EPCR (amplification per cycle)")
         colnames(result) <- c(  "Estimate", "Fixed", "(scaled)", "(scaled.SE)",
                                 paste(deparse(100*   pvalue/2) , "%", sep=""),
                                 paste(deparse(100*(1-pvalue/2)), "%", sep="") )

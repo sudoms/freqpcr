@@ -12,7 +12,8 @@
   zeroAmount,
   para.fixed = NULL,
   beta = TRUE,
-  diploid = FALSE
+  diploid = FALSE,
+  dummyDCW = FALSE
 )
 }
 \arguments{
@@ -28,7 +29,9 @@
 
 \item{beta}{Whether to use the beta distribution to approximate the sample allele ratio instead of specifying individual gamma distribution for each of the allelic DNA amounts? Default is \code{TRUE}, which accelerates the calculation.}
 
-\item{diploid}{The target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote individual, which is unlikely in many animals but necessary for the calculation in a realistic time.}
+\item{diploid}{Is the target organism diploidy? Default is \code{FALSE}, assuming haploidy. Current implementation of diploidy assumes i.i.d. between the amounts of R and S chromosomes owned by a heterozygote individual, which is unlikely in many animals but necessary for the calculation in a realistic time.}
+
+\item{dummyDCW}{Whether the \eqn{\Delta}Cq values of the control samples are dummy or not.}
 }
 \value{
 Scalar of the log likelihood.
