@@ -1,7 +1,7 @@
 # freqpcr
 Interval estimation of population allele frequency based on quantitative PCR ΔΔCq measures from bulk samples
 
-* [README in Japanese（日本語: equivalent to this document + vignette）](https://github.com/sudoms/freqpcr/README.jp.md)
+* [README in Japanese（日本語: equivalent to this document + vignette）](https://github.com/sudoms/freqpcr/blob/master/README.jp.md)
 
 # Features
 Interval estimation of the population allele frequency from qPCR analysis based on the restriction enzyme digestion (RED)-ΔΔCq method (Osakabe et al. 2017), as well as general  ΔΔCq analysis.

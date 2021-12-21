@@ -21,7 +21,7 @@ Package author: Masaaki Sudo (https://orcid.org/0000-0001-9834-9857)
 
 Estimate the frequency of a specific allele and its confidence interval when the sample allele frequencies are obtained in the form of ΔΔCq in the qPCR analyses on multiple bulk samples collected from a population. Individual DNA yield is approximated using a gamma distribution.
 
-* [日本語解説 (README in Japanese: same with this document)](https://github.com/sudoms/freqpcr/README.jp.md)
+* [日本語解説 (README in Japanese: same with this document)](https://github.com/sudoms/freqpcr/blob/master/README.jp.md)
 
 # External links
 
