@@ -327,7 +327,7 @@ RED-ΔΔCq 分析の場合、4 種類の Cq 値を入力して関数を走らせ
 
 result <- knownqpcr(housek0=d.cmp$housek0, target0=d.cmp$target0,
                     housek1=d.cmp$housek1, target1=d.cmp$target1,
-                    trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE)
+                    trueY=d.cmp$trueY, A=d.cmp$A, verbose=FALSE)
 print(result)
 ```
 
@@ -388,7 +388,7 @@ EPCR        -1.594965e+04 -8.030785e+03 -8.475267e+03 -3.794450e-01 -4.386265e-0
 # 各溶液に溶け込んでいる鋳型 DNA 量の相対値 A（不明なら入れなくてもいい）を指定
 
 result <- knownqpcr(housek1=d.cmp$housek1, target1=d.cmp$target1,
-                    trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE)
+                    trueY=d.cmp$trueY, A=d.cmp$A, verbose=FALSE)
 print(result)
 ```
 
@@ -729,18 +729,18 @@ housek0 <- c(20.5, 25.0, 25.6)
 target0 <- c(20.5, 25.5, 26.5)
 housek1 <- c(25.0, 26.0, 25.5)
 target1 <- c(35.3, 26.0 + x, 34.9)
-result <- freqpcr( N=N, housek0=housek0, target0=target0,
-    housek1=housek1, target1=target1,
-    EPCR=0.9, zeroAmount=0.00005, targetScale=0.6, sdMeasure=0.4,
-    beta=TRUE, diploid=TRUE, print.level=1 ) 
+result <- freqpcr(  N=N, housek0=housek0, target0=target0,
+                    housek1=housek1, target1=target1,
+                    EPCR=0.9, zeroAmount=0.00005, targetScale=0.6, 
+                    sdMeasure=0.4, beta=TRUE, diploid=TRUE, print.level=1  )
 
 # 妥当な推定値から 10 増やしてみる
 x <- 16.2 + 10
 target1 <- c(35.3, 26.0 + x, 34.9)
-result <- freqpcr( N=N, housek0=housek0, target0=target0,
-    housek1=housek1, target1=target1,
-    EPCR=0.9, zeroAmount=0.00005, targetScale=0.6, sdMeasure=0.4,
-    beta=TRUE, diploid=TRUE, print.level=1 ) 
+result <- freqpcr(  N=N, housek0=housek0, target0=target0,
+                    housek1=housek1, target1=target1,
+                    EPCR=0.9, zeroAmount=0.00005, targetScale=0.6,
+                    sdMeasure=0.4, beta=TRUE, diploid=TRUE, print.level=1  )
 ```
 
 妥当な `target1` の推定値 `26.0 + 16.2` を入れた場合でも、試しに 10 増やして `26.0 + 16.2 + 10` を代入した場合でも、P の推定値は 0.02109 (0.004846--0.08709) および 0.02103 (0.004831--0.08682) となり、妥当かつ大差ないことが分かるので、安心して妥当な推定値を採用すればいい。
@@ -810,15 +810,10 @@ GNU GPL (>= 3)
 * v0.3.1 (2021.01.20) First published (first draft of the preprint)
 
 # 当ページの引用文献
-* Livak, Kenneth J., & Schmittgen, T. D. (2001). Analysis of relative gene expression data using real-
-time quantitative PCR and the 2- ΔΔCT method. Methods, 25(4), 402–408.
+* Livak, Kenneth J., & Schmittgen, T. D. (2001). Analysis of relative gene expression data using real-time quantitative PCR and the 2-ΔΔCT method. Methods, 25(4), 402–408.
 * Maeoka, A., Yuan, L., Itoh, Y., Saito, C., Doi, M., Imamura, T., Yamaguchi, T., Imura, T., & Osakabe, M. (2020). Diagnostic prediction of acaricide resistance gene frequency using quantitative real-time PCR with resistance allele-specific primers in the two-spotted spider mite Tetranychus urticae population (Acari: Tetranychidae). Applied Entomology and Zoology, 55, 329–335. https://doi.org/10.1007/s13355-020-00686-7
 * Osakabe, M., Imamura, T., Nakano, R., Kamikawa, S., Tadatsu, M., Kunimoto, Y., & Doi, M. (2017). Combination of restriction endonuclease digestion with the ΔΔCt method in real-time PCR to monitor etoxazole resistance allele frequency in the two-spotted spider mite. Pesticide Biochemistry and Physiology, 139, 1–8. https://doi.org/10.1016/j.pestbp.2017.04.003
 * Sudo, M., & Osakabe, M. (2021). freqpcr: Estimation of population allele frequency using qPCR ΔΔCq measures from bulk samples. Molecular Ecology Resources, 00, 1– 14. https://doi.org/10.1111/1755-0998.13554 
 * Sudo, M., Yamamura, K., Sonoda, S., & Yamanaka, T. (2021). Estimating the proportion of resistance alleles from bulk Sanger sequencing, circumventing the variability of individual DNA. Journal of Pesticide Science, 46(2), 1–8. https://doi.org/10.1584/jpestics.D20-064
-* Vandesompele, J., De Preter, K., Pattyn, F., Poppe, B., Van Roy, N., De Paepe, A., & Speleman, F.
-(2002). Accurate normalization of real-time quantitative RT-PCR data by geometric averaging of
-multiple internal control genes. Genome Biology, 3(7), 1–12.
-* Yamamura, K., & Hino, A. (2007). Estimation of the proportion of defective units by using group
-testing under the existence of a threshold of detection. Communications in Statistics—Simulation
-and Computation, 36(5), 949–957.
+* Vandesompele, J., De Preter, K., Pattyn, F., Poppe, B., Van Roy, N., De Paepe, A., & Speleman, F. (2002). Accurate normalization of real-time quantitative RT-PCR data by geometric averaging of multiple internal control genes. Genome Biology, 3(7), 1–12.
+* Yamamura, K., & Hino, A. (2007). Estimation of the proportion of defective units by using group testing under the existence of a threshold of detection. Communications in Statistics—Simulation and Computation, 36(5), 949–957.

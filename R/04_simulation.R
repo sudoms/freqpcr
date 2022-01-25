@@ -94,7 +94,8 @@ make_dummy <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
 #' @param CqList Object belonging to the \linkS4class{CqList} class, typically the output from \code{\link{make_dummy}()}. Having the slots \code{N}, \code{housek0}, \code{target0}, \code{housek1}, and \code{target1}, all of which are numeric vectors of the same length.
 #' @param P,K,targetScale,sdMeasure If NULL (default), the parameter is considered unknown and estimated via \code{\link{freqpcr}()}. If a value is specified, it is passed to \code{\link{freqpcr}()} as a fixed parameter. On the contrary, \code{EPCR} and \code{zeroAmount} are always treated as fixed parameters, for which values must be supplied.
 #' @param beta,diploid,maxtime,print.level Configuration parameters which are passed directly to \code{\link{freqpcr}()}.
-#' @param aux Additional information to be displayed. The default is \code{NULL}. If some value is input by the user, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.
+#' @param aux Additional information to be displayed on the console. The default is \code{NULL}. If some value is input by the user, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.
+#' @param verbose Prints more information e.g. system time. Default is \code{TRUE}.
 #' @param ... Additional arguments passed to \code{\link{freqpcr}()}.
 #' @inheritParams make_dummy
 #' @return Object of the S4 class \linkS4class{CqFreq}, which is same as \code{\link{freqpcr}()}.
@@ -124,8 +125,8 @@ make_dummy <- function( rand.seed, P, K, ntrap, npertrap, scaleDNA=(1/K)*1e-06,
 #' @family estimation procedures
 sim_dummy <- function(  CqList, EPCR, zeroAmount,
                         P=NULL, K=NULL, targetScale=NULL, sdMeasure=NULL,
-                        beta, diploid, maxtime, print.level, aux=NULL, ...  ) {
-    if (!is.null(aux)) {
+                        beta, diploid, maxtime, print.level, aux=NULL, verbose=TRUE, ...  ) {
+    if (verbose | !is.null(aux)) {
         cat("\n\n")
         cat("--------------------------------------------------------------------------------")
         cat("\n")
@@ -162,7 +163,9 @@ sim_dummy <- function(  CqList, EPCR, zeroAmount,
         cal.time <- proc.time()-ptime0
         result.list <- CqFreq(report=result, obj=list(iterations=NA), cal.time=cal.time)
     }
-    print(Sys.time(), quote=FALSE)
+    if (verbose) {
+        print(Sys.time(), quote=FALSE)
+    }
     rm(e1)
     gc(); gc();
     return(result.list)

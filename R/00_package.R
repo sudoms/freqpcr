@@ -1,7 +1,7 @@
 ################################################################################################################################
 
 # Name: freqpcr
-# Short description: Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples
+# Short description: Estimates Allele Frequency on qPCR DeltaDeltaCq from Bulk Samples
 # Author: Masaaki Sudo (NARO, JAPAN)
 # Maintainer: Masaaki Sudo
 ## https://sudori.info/english.html
@@ -22,7 +22,7 @@
 
 #' The freqpcr package
 #'
-#' Maximum Interval estimation of population allele frequency based on quantitative PCR double-Delta Cq measures from bulk samples.
+#' Allele Frequency Estimation on qPCR \eqn{\Delta\Delta}Cq Values from Bulk Samples
 #'
 #' @docType package
 #' @importFrom methods new

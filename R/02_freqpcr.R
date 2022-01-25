@@ -64,7 +64,7 @@ CqFreq <- setClass("CqFreq",
 #' \cr
 #' For the unknown parameters, \code{XInit0} optionally specifies initial values for the optimization using \code{\link[stats]{nlm}()} though the use of internal default is strongly recommended. The specification as a fixed parameter has higher priority than the specification in \code{XInit0}. Every user-specified parameter values, fixed or unknown, must be given in linear scale (e.g. between 0 and 1 for the allele frequency); they are transformed internally to log or logit.
 #' @examples
-#'\dontrun{
+#' \donttest{
 #' # Dummy Cq dataset with six bulk samples, each of which comprises of eight haploids.
 #' EPCR <- 0.95; zeroAmount <- 0.0016; # True values for the two must be known.
 #' P <- 0.75
@@ -79,10 +79,12 @@ CqFreq <- setClass("CqFreq",
 #'                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
 #'                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=0 )
 #' print(result)
+#' 
 #' # Estimation with freqpcr, assuming diploidy.
 #' result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
 #'                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
 #'                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, diploid=TRUE )
+#' 
 #' # Estimation where you have knowledge on the size of K.
 #' result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
 #'                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
@@ -99,7 +101,7 @@ CqFreq <- setClass("CqFreq",
 #' result <- freqpcr( N=dmy_cq@N, housek1=dmy_cq@housek1, target1=dmy_cq@target1,
 #'                    K=2, EPCR=EPCR, zeroAmount=zeroAmount,
 #'                    targetScale=1.5, sdMeasure=0.3, beta=TRUE, print.level=1 )
-#'}
+#' }
 #' @export
 #' @family estimation procedures
 freqpcr <- function(N, A, housek0, target0, housek1, target1,
@@ -113,13 +115,13 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
     if (missing(housek0) || missing(target0)) {
         if (length(unique(c(length(housek1), length(target1)))) != 1) {
             stop(paste( "housek1 and target1 must have the same length.",
-                        "Missing Cq values must be filled with NA.", sep=" "))
+                        "Missing Cq values must be filled with NA", sep=" "))
         } else {
             model.quartet <- FALSE
-            cat("  Only housek1 and target1 are specified. The function runs as a DeltaCq model.\n")
+            warnings("Only housek1 and target1 are specified. The function runs as a DeltaCq model.\n")
             if (is.null(sdMeasure) || is.null(targetScale)) {
                 warnings(paste( " When housek0 and target0 are absent, it is recommended\n",
-                                " to fix the sizes of targetScale and sdMeasure.", sep="" ))
+                                " to fix the sizes of targetScale and sdMeasure", sep="" ))
             }
         }
     } else {
@@ -138,21 +140,20 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
     if (missing(N)) {
         # N is not specified by the user. If A is also NULL or containing NA, freqpcr() must stop.
         model.continuous <- TRUE
-        cat("\n  N (number of individuals contained in each sample) was not specified.\n", sep=" ")
+        warnings("N (number of individuals contained in each sample) was not specified.\n")
         if (missing(A) || any(is.na(A))) {
             # if A is given but contains NA, freqpcr() also stops.
-            stop("Error: A (relative sample DNA amount) was also not specified, or containing NA.",
-                "\n  Either N or A is required for running.\n",
-                sep=" ")
+            stop("'A' (relative sample DNA amount) was also not specified, or containing NA.",
+                "\n Either N or A is required\n", sep="")
         } else if (length(A) != length(target1)) {
-            stop("Lengths of A and target1 differ.\n", sep=" ")
-        } else if (print.level>0) {
-            cat("  A was specified instead of N: The function runs with the continuous model\n")
+            stop("Lengths of A and target1 differ\n", sep=" ")
+        } else {
+            warnings("  A was specified instead of N: The function runs with the continuous model\n")
         }
     } else if (any(is.na(N))) {
-        stop("N contains missing values (NA).\n") # N is present but containing NA
+        stop("N contains missing values (NA)\n") # N is present but containing NA
     } else if (length(N) != length(target1)) {
-        stop("Lengths of N and every Cq-value vector must be the same.\n", sep=" ")
+        stop("Lengths of N and every Cq-value vector must be the same\n", sep=" ")
     } else if (print.level>0) {
         # If both N and A are present, N has higher priority.
         cat("\n  N was specified: The function runs with the discrete model (the default)\n")
@@ -206,7 +207,7 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
     if (is.unknown["P"]==TRUE) {
         XInit["P"] <- qlogis(param0.full["P"]) # only 'P' is transformed in logit.
     }
-    if(print.level>0) {
+    if (print.level > 0) {
         cat("\nInitial values given by the user:\n")
         print(param0.full)
         cat("Which parameters are unknown?\n")
@@ -217,8 +218,6 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
         print(XInit)
         cat("\n")
     }
-
-#    stop("Stop here.") # for debug
 
     # Optimization for the elements of XInit
     fscale <- 1 # minimization
@@ -259,14 +258,15 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
 
     # if calculation of Z failed:
     if (class(success.nlm) == "try-error") {
-        cat("Calculation was terminated:\n")
-        print(  paste("Maximum calculation time was set", maxtime, "seconds:", 
-                "elapsed", cal.time[3], "seconds.", sep=" ")  )
-        cat("\n")
+        warnings(paste( "Optimization was terminated:\n",
+                        "Maximum calculation time was set", maxtime, "seconds:", 
+                        "elapsed", cal.time[3], "seconds.\n", sep=" " ))
         if (print.level > 0) {
             title <- paste( "Maximum-likelihood estimates with the two-sided ",
-                            deparse(100*(1-pvalue)), "% CIs", sep="")
-            cat(title, "\n", sep=""); print(result); cat("\n");
+                            deparse(100*(1-pvalue)), "% CIs\n", sep="")
+            cat(title)
+            print(result)
+            cat("\n")
         }
         return( CqFreq(report=result, obj=list(iterations=NA), cal.time=cal.time) )
     } else {
@@ -305,8 +305,10 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
 
         if (print.level > 0) {
             title <- paste( "Maximum-likelihood estimates with the two-sided ",
-                            deparse(100*(1-pvalue)), "% CIs", sep="")
-            cat(title, "\n", sep=""); print(result); cat("\n");
+                            deparse(100*(1-pvalue)), "% CIs\n", sep="")
+            cat(title)
+            print(result)
+            cat("\n")
         }
         return( CqFreq(report=result, obj=Z, cal.time=cal.time) )
     }

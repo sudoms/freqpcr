@@ -101,7 +101,7 @@ For the unknown parameters, \code{XInit0} optionally specifies initial values fo
 }
 
 \examples{
-\dontrun{
+\donttest{
 # Dummy Cq dataset with six bulk samples, each of which comprises of eight haploids.
 EPCR <- 0.95; zeroAmount <- 0.0016; # True values for the two must be known.
 P <- 0.75
@@ -116,10 +116,12 @@ result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, print.level=0 )
 print(result)
+
 # Estimation with freqpcr, assuming diploidy.
 result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,
                    EPCR=EPCR, zeroAmount=zeroAmount, beta=TRUE, diploid=TRUE )
+
 # Estimation where you have knowledge on the size of K.
 result <- freqpcr( N=dmy_cq@N, housek0=dmy_cq@housek0, target0=dmy_cq@target0,
                    housek1=dmy_cq@housek1, target1=dmy_cq@target1,

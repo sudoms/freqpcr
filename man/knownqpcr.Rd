@@ -17,7 +17,7 @@ knownqpcr(
   pvalue = 0.05,
   trace = 0,
   report = 10,
-  quiet = FALSE
+  verbose = FALSE
 )
 }
 \arguments{
@@ -39,7 +39,7 @@ In RED-\eqn{\Delta\Delta}Cq method, \code{housek0} and \code{target0} correspond
 
 \item{report}{The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.}
 
-\item{quiet}{Suppress the output of the function sent to stdout?}
+\item{verbose}{Send messages to stdout? Default is FALSE.}
 }
 \value{
 A table containing the estimated values for the following parameters:
@@ -79,12 +79,12 @@ print(d.cmp)
 # Each argument must be specified with its name (name=source).
 knownqpcr(  housek0=d.cmp$housek0, target0=d.cmp$target0,
             housek1=d.cmp$housek1, target1=d.cmp$target1,
-            trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE  )
+            trueY=d.cmp$trueY, A=d.cmp$A, verbose=FALSE  )
 
 # In general DeltaDeltaCq analyses, the experimental design will not include
 # dedicated control samples. The function then runs without 'housek0' and 'target0'.
 knownqpcr(  housek1=d.cmp$housek1, target1=d.cmp$target1,
-            trueY=d.cmp$trueY, A=d.cmp$A, quiet=FALSE  )
+            trueY=d.cmp$trueY, A=d.cmp$A, verbose=TRUE  )
 }
 \seealso{
 Other estimation procedures: 

@@ -17,6 +17,7 @@ sim_dummy(
   maxtime,
   print.level,
   aux = NULL,
+  verbose = TRUE,
   ...
 )
 }
@@ -31,7 +32,9 @@ sim_dummy(
 
 \item{beta, diploid, maxtime, print.level}{Configuration parameters which are passed directly to \code{\link{freqpcr}()}.}
 
-\item{aux}{Additional information to be displayed. The default is \code{NULL}. If some value is input by the user, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.}
+\item{aux}{Additional information to be displayed on the console. The default is \code{NULL}. If some value is input by the user, it is echoed to stdout together with the contents of the argument \code{CqList}. This option is convenient when you want to record the original dummy dataset and the corresponding result sequentially e.g. using \code{capture.output()}.}
+
+\item{verbose}{Prints more information e.g. system time. Default is \code{TRUE}.}
 
 \item{...}{Additional arguments passed to \code{\link{freqpcr}()}.}
 }

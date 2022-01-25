@@ -7,9 +7,11 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes 
+0 errors | 0 warnings | 1 note 
 
 ```
+New submission
+
 Possibly mis-spelled words in DESCRIPTION:
   Cq (10:241)
   DeltaDeltaCq (4:26, 10:136, 10:198)
@@ -20,14 +22,15 @@ Possibly mis-spelled words in DESCRIPTION:
 ```
 > inst/WORDLIST was added.
 
-```
-Found the following (possibly) invalid URLs:
-  URL: https://github.com/sudoms/freqpcr/README.jp.md
-    From: inst/doc/freqpcr-intro.html
-    Status: 404
-    Message: Not Found
-```
-> The link is going to work after v0.4.0 is released and open to the public on github.com
+## Revisions
+
+> Title in DESCRIPTION was reduced to 65 characters.
+
+> doi was added to the description.
+
+> \dontrun{} in the example of `freqpcr` function was changed to \donttest{} as it takes 6 sec.
+
+> Message output was re-designed and the 'quiet' argument in `knownqpcr` function was renamed as 'verbose'. This also affects the example code in the vignette (line 381).
 
 ## revdepcheck results
 

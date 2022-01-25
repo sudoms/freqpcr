@@ -16,7 +16,7 @@ knownqpcr_unpaired(
   pvalue = 0.05,
   trace = 0,
   report = 10,
-  quiet = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -40,7 +40,7 @@ knownqpcr_unpaired(
 
 \item{report}{The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.}
 
-\item{quiet}{Suppress the output of the function sent to stdout?}
+\item{verbose}{Send messages to stdout? Default is FALSE.}
 }
 \value{
 A table containing the estimated parameter values. The format is same as \code{\link{knownqpcr}()}.

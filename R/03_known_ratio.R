@@ -20,7 +20,7 @@
 #' @param method A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.
 #' @param trace Non-negative integer. If positive, \code{\link[stats]{optim}()} outputs trace information. The default is 0 (no information).
 #' @param report The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.
-#' @param quiet Suppress the output of the function sent to stdout?
+#' @param verbose Send messages to stdout? Default is FALSE.
 #' @inheritParams freqpcr
 #' @return A table containing the estimated values for the following parameters:
 #' \enumerate{
@@ -51,21 +51,21 @@
 #' # Each argument must be specified with its name (name=source).
 #' knownqpcr(  housek0=d.cmp$housek0, target0=d.cmp$target0,
 #'             housek1=d.cmp$housek1, target1=d.cmp$target1,
-#'             trueY=d.cmp$trueY, A=d.cmp$A, quiet=TRUE  )
+#'             trueY=d.cmp$trueY, A=d.cmp$A, verbose=FALSE  )
 #'
 #' # In general DeltaDeltaCq analyses, the experimental design will not include
 #' # dedicated control samples. The function then runs without 'housek0' and 'target0'.
 #' knownqpcr(  housek1=d.cmp$housek1, target1=d.cmp$target1,
-#'             trueY=d.cmp$trueY, A=d.cmp$A, quiet=FALSE  )
+#'             trueY=d.cmp$trueY, A=d.cmp$A, verbose=TRUE  )
 #' @export
 #' @family estimation procedures
 knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, length(trueY)),
                         XInit=c(meanDNA=-10, targetScale=0, baseChange=0, sdMeasure=1, zeroAmount=-5, EPCR=0),
-                        method="BFGS", pvalue=0.05, trace=0, report=10, quiet=FALSE  ) {
+                        method="BFGS", pvalue=0.05, trace=0, report=10, verbose=FALSE  ) {
 
     arg.len <- length(unique(c(length(A), length(trueY), length(housek1), length(target1))))
     if (arg.len != 1) {
-        stop(paste("Error: the arguments A, trueY, housek1, and target1 must have the same length."))
+        stop("The arguments A, trueY, housek1, and target1 must have the same length.")
     }
     quartet <- TRUE
     if (missing(housek0) | missing(target0)) {
@@ -73,10 +73,10 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
         quartet <- FALSE
         # The parameter 'baseChange' is not defined for duo. It is the case in general DeltaDeltaCq analyses.
         XInit <- XInit[names(XInit) != "baseChange"]
-        cat("\nEither housek0 or target0 was not specified. 'baseChange' will not be estimated.\n")
+        warnings("\nEither housek0 or target0 was not specified. 'baseChange' will not be estimated.\n")
     } else {
         if (length(unique(c(length(housek0), length(target0), length(housek1), length(target1)))) != 1) {
-            stop(paste( "When you input the RED-DeltaDeltaCq dataset in the 'paired' format, \n",
+            stop(paste( "When you input RED-DeltaDeltaCq data in the 'paired' format, \n",
                         "all of housek0, target0, housek1, and target1 must have the same length. \n",
                         "Fill missing values with NA, or use 'knownqpcr_unpaired' function instead.", sep="" ))
         }
@@ -84,8 +84,8 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
 
     dam0 <- cbind(trueY, A)
     is.na.data <- is.na(rowSums(dam0))
-    if (quiet==FALSE & sum(is.na.data>0)) {
-        cat("\nEither A or trueY contains missing value? If TRUE, the row is omitted before model fitting.\n")
+    if (verbose & sum(is.na.data) > 0) {
+        cat("\nEither A or trueY contains missing value? If TRUE, the data points are omitted before model fitting.\n")
         print(is.na.data)
     }
 
@@ -116,23 +116,12 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
         Y.long <- rep(trueY, 2)
         Gene <- c(  rep(0, length(housek1)), rep(1, length(target1))  )
         Digest <-   rep(1, length(housek1) + length(target1))
-
-        # If there is an observation of Y == 1, it should be a control sample.
-        # The data is automatically re-assigned to Digest == 0.
-        # Note that the data lengths of the test sample and control can differ only the when structure is 'duo'.
-#        Digest[Y.long==1] <- 0
-#        if (quiet==FALSE) {
-#            if (any(Y.long==1)) {
-#                cat("\nThere are test samples with trueY == 1.",
-#                    "They are re-assigned internally to Digest == 0 (control sample).\n", sep=" ")
-#            }
-#        }
     }
 
     dam <- data.frame(Y.long, Digest, Gene, A.long, Cq.long)
     is.na.data <- is.na(rowSums(dam))
     dam <- dam[!is.na.data, ]
-    if (quiet==FALSE) {
+    if (verbose) {
         cat("Internal dataset actually used for model fitting:\n")
         print(dam)
     }
@@ -175,7 +164,7 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
                             paste(deparse(100*   pvalue/2) , "%", sep=""),
                             paste(deparse(100*(1-pvalue/2)), "%", sep="")  )
 
-    if (quiet==FALSE) {
+    if (verbose) {
         title <- paste( "Maximum-likelihood estimates with the two-sided ",
                         deparse(100*(1-pvalue)), "% CIs", sep="" )
         cat("\n", title, "\n", sep="")
@@ -199,7 +188,7 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
 #' @param method A string specifying the optimization algorithm used in \code{\link[stats]{optim}()}. The default is \code{BFGS}, which is plausible in most situation.
 #' @param trace Non-negative integer. If positive, \code{\link[stats]{optim}()} outputs trace information. The default is 0 (no information).
 #' @param report The frequency of reports if \code{trace} is positive. Defaults to every 10 iterations.
-#' @param quiet Suppress the output of the function sent to stdout?
+#' @param verbose Send messages to stdout? Default is FALSE.
 #' @inheritParams freqpcr
 #' @return A table containing the estimated parameter values. The format is same as \code{\link{knownqpcr}()}.
 #' @examples
@@ -237,7 +226,7 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
 #' @family estimation procedures
 knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
                                 XInit=c(meanDNA=-10, targetScale=0, baseChange=0, sdMeasure=1, zeroAmount=-5, EPCR=0),
-                                method="BFGS", pvalue=0.05, trace=0, report=10, quiet=FALSE ) {
+                                method="BFGS", pvalue=0.05, trace=0, report=10, verbose=TRUE ) {
 
     arg.len <- length(unique(c(length(Digest), length(Gene), length(trueY), length(Cq), length(A))))
     if (!arg.len) {
@@ -256,23 +245,12 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
     dam <- data.frame(trueY, Digest, Gene, A, Cq)
     is.na.data <- is.na(rowSums(dam))
     dam <- dam[!is.na.data, ]
-    if (quiet==FALSE & sum(is.na.data>0)) {
+    if (verbose & sum(is.na.data) > 0) {
         cat("\nThe data row contains missing value? If TRUE, the row will be omitted before the model fitting.\n")
         print(is.na.data)
     }
 
-#    if (!quartet) {
-#        # If there is a data of Y == 1, it is automatically re-assigned to Digest == 0 (control sample).
-#        # This operation accelerates the convergence of targetScale.
-#        # Note that the data structure is 'duo', and then the data lengths of the test sample and control can differ.
-#        dam[dam$Y.long==1, "Digest"] <- 0
-#        if (quiet==FALSE & any(dam$Y.long==1)) {
-#            cat("\nThere are test samples with trueY == 1.",
-#                "They are re-assigned internally to Digest == 0 (control sample).\n", sep=" ")
-#        }
-#    }
-
-    if (quiet==FALSE) {
+    if (verbose) {
         dam2 <- dam
         colnames(dam2) <- c("Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
                             "Rel_DNA_content", "Cq")
@@ -316,7 +294,7 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
                             paste(deparse(100*   pvalue/2) , "%", sep=""),
                             paste(deparse(100*(1-pvalue/2)), "%", sep="")  )
 
-    if (quiet==FALSE) {
+    if (verbose) {
         title <- paste( "Maximum-likelihood estimates with the two-sided ",
                         deparse(100*(1-pvalue)), "% CIs", sep="" )
         cat("\n", title, "\n", sep="")
