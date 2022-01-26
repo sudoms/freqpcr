@@ -65,40 +65,44 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
 
     arg.len <- length(unique(c(length(A), length(trueY), length(housek1), length(target1))))
     if (arg.len != 1) {
-        stop("The arguments A, trueY, housek1, and target1 must have the same length.")
+        stop("The arguments 'A', 'trueY', ('housek0', 'target0'), 'housek1', and 'target1' all must have the same length")
     }
     quartet <- TRUE
-    if (missing(housek0) | missing(target0)) {
+    if (missing(housek0) || missing(target0)) {
         # If either housek0 or target0 is absent, then the dataset is treated as "duo."
         quartet <- FALSE
         # The parameter 'baseChange' is not defined for duo. It is the case in general DeltaDeltaCq analyses.
         XInit <- XInit[names(XInit) != "baseChange"]
-        warnings("\nEither housek0 or target0 was not specified. 'baseChange' will not be estimated.\n")
+        warning("Either 'housek0' or 'target0' was not specified. 'baseChange' is not estimated", 
+                immediate.=as.logical(verbose))
     } else {
         if (length(unique(c(length(housek0), length(target0), length(housek1), length(target1)))) != 1) {
-            stop(paste( "When you input RED-DeltaDeltaCq data in the 'paired' format, \n",
-                        "all of housek0, target0, housek1, and target1 must have the same length. \n",
-                        "Fill missing values with NA, or use 'knownqpcr_unpaired' function instead.", sep="" ))
+            stop(paste( "As for the 'paired' format, ",
+                        "'housek0', 'target0', 'housek1', and 'target1' all must have the same length.\n",
+                        "  Fill the missing values with NA, or use 'knownqpcr_unpaired' function", sep="" ))
         }
     }
 
     dam0 <- cbind(trueY, A)
-    is.na.data <- is.na(rowSums(dam0))
-    if (verbose & sum(is.na.data) > 0) {
-        cat("\nEither A or trueY contains missing value? If TRUE, the data points are omitted before model fitting.\n")
-        print(is.na.data)
+    is.na.YA <- is.na(rowSums(dam0))
+    if (verbose & sum(is.na.YA) > 0) {
+        warning("Either 'A' or 'trueY' contains missing value. The following samples are omitted",
+                immediate.=as.logical(verbose))
+        print(which(is.na.YA))
     }
 
     if (quartet) {
         # Homogeneity of the data length was already verified. Then trim the missing data element.
-        housek0 <- housek0[!is.na.data]
-        target0 <- target0[!is.na.data]
-        housek1 <- housek1[!is.na.data]
-        target1 <- target1[!is.na.data]
-        trueY <- trueY[!is.na.data]
-        A <- A[!is.na.data]
+        ID <- c(1:length(trueY))[!is.na.YA]
+        housek0 <- housek0[!is.na.YA]
+        target0 <- target0[!is.na.YA]
+        housek1 <- housek1[!is.na.YA]
+        target1 <- target1[!is.na.YA]
+        trueY <- trueY[!is.na.YA]
+        A <- A[!is.na.YA]
 
         Cq.long <- c(housek0, target0, housek1, target1)
+        ID.long <- rep(ID, 4)
         A.long <- rep(A, 4)
         Y.long <- rep(trueY, 4)
         Gene <- c(  rep(0, length(housek0)), rep(1, length(target0)), 
@@ -106,29 +110,32 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
         Digest <- c(rep(0, length(housek0) + length(target0)), 
                     rep(1, length(housek1) + length(target1)))
     } else {
-        housek1 <- housek1[!is.na.data]
-        target1 <- target1[!is.na.data]
-        trueY <- trueY[!is.na.data]
-        A <- A[!is.na.data]
+        ID <- c(1:length(trueY))[!is.na.YA]
+        housek1 <- housek1[!is.na.YA]
+        target1 <- target1[!is.na.YA]
+        trueY <- trueY[!is.na.YA]
+        A <- A[!is.na.YA]
 
         Cq.long <- c(housek1, target1)
+        ID.long <- rep(ID, 2)
         A.long <- rep(A, 2)
         Y.long <- rep(trueY, 2)
         Gene <- c(  rep(0, length(housek1)), rep(1, length(target1))  )
         Digest <-   rep(1, length(housek1) + length(target1))
     }
 
-    dam <- data.frame(Y.long, Digest, Gene, A.long, Cq.long)
+    dam <- data.frame(ID=ID.long, trueY=Y.long, Digest=Digest, Gene=Gene, A=A.long, Cq=Cq.long)
+    # As Cq values allow missing (NA) data, NAs are removed here again, which is independent of 'is.na.YA'
     is.na.data <- is.na(rowSums(dam))
     dam <- dam[!is.na.data, ]
     if (verbose) {
-        cat("Internal dataset actually used for model fitting:\n")
+        cat("  Internal dataset actually used for model fitting:\n")
         print(dam)
     }
 
     if (quartet) {
         Z <- optim( par=XInit, fn=.knownqpcr_loglike, gr=NULL,
-                    dam$A.long, dam$Y.long, dam$Digest, dam$Gene, dam$Cq.long,
+                    dam$A, dam$trueY, dam$Digest, dam$Gene, dam$Cq,
                     method=method, control=list(fnscale=-1, trace=trace, REPORT=report), hessian=TRUE )
         SE <- sqrt(-diag(solve(Z$hessian))) # When maximized, diag(inv._of_hessian) will be negative.
         qvalue <- -qnorm(p=pvalue/2, mean=0, sd=1) # if pvalue=0.05, it returns 2.5 percentile of N(0, 1)
@@ -145,7 +152,7 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
                                 "EPCR (amplification per cycle)"  )
     } else {
         Z <- optim( par=XInit, fn=.knownqpcr_loglike_duo, gr=NULL,
-                    dam$A.long, dam$Y.long, dam$Digest, dam$Gene, dam$Cq.long,
+                    dam$A, dam$trueY, dam$Digest, dam$Gene, dam$Cq,
                     method=method, control=list(fnscale=-1, trace=trace, REPORT=report), hessian=TRUE )
         SE <- sqrt(-diag(solve(Z$hessian))) # When maximized, diag(inv._of_hessian) will be negative.
         qvalue <- -qnorm(p=pvalue/2, mean=0, sd=1) # if pvalue=0.05, it returns 2.5 percentile of N(0, 1)
@@ -226,19 +233,20 @@ knownqpcr <- function(  housek0, target0, housek1, target1, trueY, A=rep(1, leng
 #' @family estimation procedures
 knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
                                 XInit=c(meanDNA=-10, targetScale=0, baseChange=0, sdMeasure=1, zeroAmount=-5, EPCR=0),
-                                method="BFGS", pvalue=0.05, trace=0, report=10, verbose=TRUE ) {
+                                method="BFGS", pvalue=0.05, trace=0, report=10, verbose=FALSE ) {
 
     arg.len <- length(unique(c(length(Digest), length(Gene), length(trueY), length(Cq), length(A))))
     if (!arg.len) {
-        stop(paste("Error: the arguments Digest, Gene, trueY, Cq, and A must have the same length."))
+        stop("The arguments 'Digest', 'Gene', 'trueY, 'Cq', and 'A' all must have the same length")
     }
     quartet <- TRUE
-    if (min(Digest, na.rm=TRUE)>0) {
+    if (min(Digest, na.rm=TRUE) > 0) {
         # If all the samples are marked as "digested," then the dataset is treated as "duo."
         quartet <- FALSE
         # The parameter 'baseChange' is not defined for duo. It is the case in general DeltaDeltaCq analyses.
         XInit <- XInit[names(XInit) != "baseChange"]
-        cat("\nAs all samples are marked `digested', `baseChange' will not be estimated.\n")
+        warning("As all samples are marked `digested', 'baseChange' is not estimated", 
+                immediate.=as.logical(verbose))
     }
 
     # Trim the missing data element.
@@ -246,15 +254,16 @@ knownqpcr_unpaired <- function( Digest, Gene, trueY, Cq, A=rep(1, length(Cq)),
     is.na.data <- is.na(rowSums(dam))
     dam <- dam[!is.na.data, ]
     if (verbose & sum(is.na.data) > 0) {
-        cat("\nThe data row contains missing value? If TRUE, the row will be omitted before the model fitting.\n")
-        print(is.na.data)
+        warning("The data contain missing values. The following data points are omitted",
+                immediate.=as.logical(verbose))
+        print(which(is.na.data))
     }
 
     if (verbose) {
         dam2 <- dam
         colnames(dam2) <- c("Allele_ratio", "Sample_(control=0,_test=1)", "Gene_(housek=0,_target=1)",
                             "Rel_DNA_content", "Cq")
-        cat("Internal dataset actually used for model fitting:\n", sep="")
+        cat("  Internal dataset actually used for model fitting:\n", sep="")
         print(dam2, max=ncol(dam2)*200)
     }
 

@@ -109,89 +109,109 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
                     XInit0=c(P=NULL, K=NULL, targetScale=NULL, sdMeasure=NULL, EPCR=NULL),
                     zeroAmount=NULL, beta=TRUE, diploid=FALSE,
                     pvalue=0.05, gradtol=1e-4, steptol=1e-9, iterlim=100, maxtime=600, print.level=1, ...) {
-
     # (v0.4.0) experimental: Delta Cq analysis: only housek1 and target1 are used.
     model.quartet <- TRUE
     if (missing(housek0) || missing(target0)) {
-        if (length(unique(c(length(housek1), length(target1)))) != 1) {
-            stop(paste( "housek1 and target1 must have the same length.",
+        if (length(housek1) != length(target1)) {
+            stop(paste( "'housek1' and 'target1' must have the same length.",
                         "Missing Cq values must be filled with NA", sep=" "))
         } else {
             model.quartet <- FALSE
-            warnings("Only housek1 and target1 are specified. The function runs as a DeltaCq model.\n")
+            warning(paste( "Only 'housek1' and 'target1' are specified. The function runs as a DeltaCq model" ), 
+                    immediate.=as.logical(print.level))
             if (is.null(sdMeasure) || is.null(targetScale)) {
-                warnings(paste( " When housek0 and target0 are absent, it is recommended\n",
-                                " to fix the sizes of targetScale and sdMeasure", sep="" ))
+                warning(paste(  "When 'housek0' and 'target0' are absent, it is recommended",
+                                "to fix the sizes of 'targetScale' and 'sdMeasure'", sep=" "  ), 
+                        immediate.=as.logical(print.level))
             }
         }
     } else {
         # DeltaDeltaCq analysis: four Cq vectors must have the same length.
         if (length(unique(c(length(housek0), length(target0), length(housek1), length(target1)))) != 1) {
-            stop(paste( " The Cq vectors housek0, target0, housek1, and target1 must have the same length.",
+            stop(paste( "The Cq vectors 'housek0', 'target0', 'housek1', and 'target1' must have the same length.\n",
                         "  Fill any missing value with NA", sep=""))
         }
     }
 
     if (is.null(EPCR) & length(target1)<3) {
-        warnings(paste(" Warning: when EPCR is unknown, please supply Cq set at least of length>=3"))
+        warning("When 'EPCR' is unknown, please supply Cq set at least of length >= 3", 
+                immediate.=as.logical(print.level))
     }
 
     model.continuous <- FALSE
     if (missing(N)) {
         # N is not specified by the user. If A is also NULL or containing NA, freqpcr() must stop.
         model.continuous <- TRUE
-        warnings("N (number of individuals contained in each sample) was not specified.\n")
+        warning("'N' (number of individuals contained in each sample) was not specified", 
+                immediate.=as.logical(print.level))
         if (missing(A) || any(is.na(A))) {
             # if A is given but contains NA, freqpcr() also stops.
-            stop("'A' (relative sample DNA amount) was also not specified, or containing NA.",
-                "\n Either N or A is required\n", sep="")
+            stop(paste( "'A' (relative sample DNA amount) was also absent, or containing NA.",
+                        "  Either 'N' or 'A' is required", sep="\n" ))
         } else if (length(A) != length(target1)) {
-            stop("Lengths of A and target1 differ\n", sep=" ")
+            stop("Lengths of 'A' and 'target1' (and other Cq data) must be the same")
         } else {
-            warnings("  A was specified instead of N: The function runs with the continuous model\n")
+            warning("'A' was specified instead of 'N': The function runs with the continuous model",
+                    immediate.=as.logical(print.level))
         }
     } else if (any(is.na(N))) {
-        stop("N contains missing values (NA)\n") # N is present but containing NA
+        stop("'N' contains missing (NA) values") # N is present but containing NA
     } else if (length(N) != length(target1)) {
-        stop("Lengths of N and every Cq-value vector must be the same\n", sep=" ")
-    } else if (print.level>0) {
+        stop("Lengths of 'N' and 'target1' (and other Cq data) must be the same")
+    } else if (print.level > 0) {
         # If both N and A are present, N has higher priority.
-        cat("\n  N was specified: The function runs with the discrete model (the default)\n")
+        cat("\n  'N' was specified: The function runs with the discrete model (the default)\n")
     }
 
-#    if (beta & is.null(K)) {
-#        warning(paste("Warning: if beta==TRUE, you should specify 'K' as a fixed parameter (or default 1.0)"))
-#    }
     if (is.null(EPCR)) {
-        warning(paste(" Warning: you should specify 'EPCR' as a fixed parameter"))
+        warning("Default value for 'EPCR' = 0.99 is used. You should specify 'EPCR' as a fixed parameter",
+                immediate.=1)
     }
     if (is.null(zeroAmount)) {
-        stop("The size of 'zeroAmount' must be specified as a numeric between 0 and 1\n")
-    }
-    # It may be the case that control sample Cq mesures are only available for a part of the replicates.
-    # Thus, Cq data can accept missing values while cannot N and A. NA are then trimmed inside the likelihood function.
-    DCD <- target1-housek1
-    if (model.quartet) {
-        DCW <- target0-housek0
-        deldel <- DCD-DCW
-    } else {
-        # when DeltaCq is used, initial P is calculated from DCD (=target1-housek1).
-        # 1.99 is the approximation of "1 + EPCR".
-        DCW <- ifelse(is.null(targetScale), numeric(length(DCD)), rep(-log(targetScale)/log(1.99), length(DCD)))
-        deldel <- DCD-DCW
+        stop("The size of 'zeroAmount' must be specified as a numeric between 0 and 1")
     }
 
-    # a fixed-length vector that stores each parameter is target of estimation （TRUE） or fixed （FALSE）
+    # It may be the case that control sample Cq mesures are only available for a part of the replicates.
+    # Thus, Cq data can accept missing values while cannot N and A. NA are then trimmed.
+    if (model.quartet) {
+        if (model.continuous) {
+            trimdata <- data.frame(housek0=housek0, target0=target0, housek1=housek1, target1=target1, A=A)
+        } else {
+            trimdata <- data.frame(housek0=housek0, target0=target0, housek1=housek1, target1=target1, N=N)
+        }
+    } else {
+        if (model.continuous) {
+            trimdata <- data.frame(housek1=housek1, target1=target1, A=A)
+        } else {
+            trimdata <- data.frame(housek1=housek1, target1=target1, N=N)
+        }
+    }
+    # Homogeneity of the data length was already verified. Then trim the missing data element.
+    if (print.level > 0 & sum(!stats::complete.cases(trimdata)) > 0) {
+        # If both N and A are present, N has higher priority.
+        warning("Cq data contain missing (NA) values. They are trimmed", immediate.=1)
+    }
+    trimdata <- trimdata[stats::complete.cases(trimdata), ]
+    DCD <- trimdata$target1 - trimdata$housek1
+    if (model.quartet) {
+        DCW <- trimdata$target0 - trimdata$housek0
+    } else {
+        # when the model is DeltaCq, initial P is calculated from DCD. 1.99 is the approximation of "1 + EPCR".
+        DCW <- ifelse(is.null(targetScale), numeric(length(DCD)), rep(-log(targetScale)/log(1.99), length(DCD)))
+    }
+    deldel <- DCD - DCW
+
+    # 'is.unknown' is a fixed-length vector; if each parameter is target of estimation (TRUE) or fixed (FALSE)
     is.unknown <- c(    P=is.null(P), K=is.null(K), targetScale=is.null(targetScale),
                         sdMeasure=is.null(sdMeasure), EPCR=is.null(EPCR))
-    # Full parameter vector is initialized with the default values. 
+    # Full parameter vector is initialized with the default values (in linear scale). 
     param0.full <- c(   P=1.99^-max(mean(deldel), 0.1), K=1.0, targetScale=exp(-mean(DCW)*log(1.99)),
-                        sdMeasure=0.5, EPCR=0.99   ) # In linear scale.
-    # Extract fixed parameters.
+                        sdMeasure=0.5, EPCR=0.99   )
+    # Extract fixed parameters. First, the vector is initialized as blank.
     para.fixed <- numeric(0)
+    # Then, fixed part of the parameter vector is substituted with user-specified values.
     try({
         para.fixed <- c(P=P, K=K, targetScale=targetScale, sdMeasure=sdMeasure, EPCR=EPCR)
-        # fixed part of the parameter vector is substituted with user-specified values.
         param0.full[names(is.unknown[!is.unknown])] <- para.fixed
     }, silent=TRUE) # try is used because it returns error when all parameters are unknown (substitution=NULL)
     # If the initial values for the unknown parameters are specified by user
@@ -208,13 +228,9 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
         XInit["P"] <- qlogis(param0.full["P"]) # only 'P' is transformed in logit.
     }
     if (print.level > 0) {
-        cat("\nInitial values given by the user:\n")
-        print(param0.full)
-        cat("Which parameters are unknown?\n")
-        print(is.unknown)
-        cat("Fixed parameters:\n")
+        cat("\nFixed parameters:\n")
         print(para.fixed)
-        cat("Initial value for optimization:\n")
+        cat("\nInitial value for optimization:\n")
         print(XInit)
         cat("\n")
     }
@@ -227,13 +243,13 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
     success.nlm <- try({
         if (model.continuous==TRUE) {
             Z <- nlm(   f=.freqpcr_loglike_cont, p=XInit,
-                        A=A, DCW=DCW, DCD=DCD, zeroAmount=zeroAmount, para.fixed=para.fixed,
+                        A=trimdata$A, DCW=DCW, DCD=DCD, zeroAmount=zeroAmount, para.fixed=para.fixed,
                         beta=beta, dummyDCW=!model.quartet,
                         hessian=TRUE, fscale=fscale, print.level=print.level,
                         gradtol=gradtol, steptol=steptol, iterlim=iterlim   )
         } else {
             Z <- nlm(   f=.freqpcr_loglike, p=XInit,
-                        N=N, DCW=DCW, DCD=DCD, zeroAmount=zeroAmount, para.fixed=para.fixed,
+                        N=trimdata$N, DCW=DCW, DCD=DCD, zeroAmount=zeroAmount, para.fixed=para.fixed,
                         beta=beta, diploid=diploid, dummyDCW=!model.quartet,
                         hessian=TRUE, fscale=fscale, print.level=print.level,
                         gradtol=gradtol, steptol=steptol, iterlim=iterlim   )
@@ -258,9 +274,10 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
 
     # if calculation of Z failed:
     if (class(success.nlm) == "try-error") {
-        warnings(paste( "Optimization was terminated:\n",
-                        "Maximum calculation time was set", maxtime, "seconds:", 
-                        "elapsed", cal.time[3], "seconds.\n", sep=" " ))
+        warning(paste(  "Optimization was terminated:\n",
+                        "  Maximum calculation time was set ", maxtime, " seconds: ", 
+                        "  elapsed ", cal.time[3], " seconds.\n", sep=""  ),
+                immediate.=as.logical(print.level))
         if (print.level > 0) {
             title <- paste( "Maximum-likelihood estimates with the two-sided ",
                             deparse(100*(1-pvalue)), "% CIs\n", sep="")
@@ -278,9 +295,10 @@ freqpcr <- function(N, A, housek0, target0, housek1, target1,
         }
         if (Z$iterations < 1) {
             # This often happens when the input size of sdMeasure is unrealistically small.
-            warning(paste(  " Warning: Optimization ended in its first step.", 
+            warning(paste(  "Optimization ended in its first step. ", 
                             "Calculated log-likelihood and/or the gradient might be too small.\n", 
-                            "  Possibly re-check the input size of K and sdMeasure.", sep=" "  ))
+                            "  Possibly re-check the input size of 'K' and 'sdMeasure'", sep=""  ),
+                immediate.=as.logical(print.level))
         }
         Est <- exp(Param) # Optimization was conducted in log scale.
         Est[1] <- plogis(Param[1]) # Only P was estimated in logit scale.

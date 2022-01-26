@@ -16,7 +16,7 @@ knownqpcr_unpaired(
   pvalue = 0.05,
   trace = 0,
   report = 10,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
